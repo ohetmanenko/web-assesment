@@ -309,15 +309,6 @@ const Home = () => {
             </h1>
             <p className="muted">{t('Every entry is a step toward a clearer picture.')}</p>
           </div>
-          <Button
-            type="primary"
-            size="large"
-            icon={<FontAwesomeIcon icon={faPlus} />}
-            onClick={add}
-            disabled={loading && !records.length}
-          >
-            {t('Add transaction')}
-          </Button>
         </section>
         <section className="summary-grid" aria-label={t('All transaction totals')}>
           {[
@@ -367,15 +358,26 @@ const Home = () => {
               </h2>
               <p className="muted">{t('The little details of your day-to-day.')}</p>
             </div>
-            <Tooltip title={t('Refresh transactions')}>
+            <div className="panel-actions">
+              <Tooltip title={t('Refresh transactions')}>
+                <Button
+                  type="text"
+                  aria-label={t('Refresh transactions')}
+                  loading={loading}
+                  onClick={load}
+                  icon={<FontAwesomeIcon icon={faRotateRight} />}
+                />
+              </Tooltip>
               <Button
-                type="text"
-                aria-label={t('Refresh transactions')}
-                loading={loading}
-                onClick={load}
-                icon={<FontAwesomeIcon icon={faRotateRight} />}
-              />
-            </Tooltip>
+                type="primary"
+                size="large"
+                icon={<FontAwesomeIcon icon={faPlus} />}
+                onClick={add}
+                disabled={loading && !records.length}
+              >
+                {t('Add transaction')}
+              </Button>
+            </div>
           </div>
           <div className="table-toolbar">
             <Segmented

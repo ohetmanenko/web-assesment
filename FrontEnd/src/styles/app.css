@@ -112,7 +112,7 @@ a {
 .page-heading p {
   margin: 0;
 }
-.page-heading .ant-btn {
+.panel-actions .ant-btn-primary {
   height: 44px;
   padding-inline: 20px;
   font-size: 13px;
@@ -188,6 +188,13 @@ a {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
+}
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 .panel-heading h2 {
   display: flex;
@@ -731,9 +738,6 @@ a {
   .page-heading h1 {
     font-size: 33px;
   }
-  .page-heading .ant-btn {
-    width: 100%;
-  }
   .summary-grid {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -754,6 +758,11 @@ a {
   }
   .panel-heading {
     padding: 20px 16px 18px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .panel-actions {
+    justify-content: flex-end;
   }
   .table-toolbar {
     flex-direction: column;

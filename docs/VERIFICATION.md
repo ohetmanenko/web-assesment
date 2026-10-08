@@ -47,6 +47,7 @@ Using the local MongoDB fallback:
 26. In the Italian Other autocomplete, `tras` suggests `Trasporti`; selecting it reuses canonical `Transport` in Category and hides the optional name. Clear removes the value and its own button. A malformed amount and missing category produce Italian validation messages.
 27. At 320 and 390 px, the localized header and mobile list have no horizontal document overflow. Focusing/tapping a date produces only the local creation time, such as `13:32:34`.
 28. After the final session review, sign out, fill demo credentials, sign in, open/cancel the transaction form and reload. The authenticated diary returns, all existing records remain present and the inspected tab reports no console errors or warnings. This smoke check does not replace the controlled concurrency tests.
+29. Move Add transaction into the transaction panel heading, immediately after Refresh. The relocated button opens the same form. At 390 px the actions occupy a separate row below the title without horizontal overflow. Frontend lint, formatting and build pass after this layout-only change.
 
 Local browser screenshots are under ignored `.local/screenshots`. Real user records are not exported. Screenshots from the QA cycle are local verification evidence, not submission assets.
 
