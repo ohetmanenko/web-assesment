@@ -5,12 +5,13 @@
 - `npm test`: 3 suites, **66 tests passed**, using Jest 30.5.2, Supertest and isolated MongoDB. Category tests cover Title Case, duplicate prevention, type changes, optional Other names, legacy values, persistence after deletion and user isolation.
 - `npm run lint`: API and frontend passed.
 - `npm run format:check`: active API/frontend files passed.
-- `npm run build`: passed with Vite 8.3.3; one bundle-size warning remains (about 392 KB gzipped).
+- `npm run build`: passed with Vite 8.3.3; one bundle-size warning remains (about 408 KB gzipped).
 - `docker compose config --quiet`: passed; configuration syntax is valid.
 - `git diff --check`: passed.
 - Original evidence SHA-256 still matches the recorded original.
 - Local env files and evidence are ignored; env files have been removed from the Git index.
-- The earlier 61-file allowlisted clean export passed `npm run setup`, `npm run build` and `npm run seed`. Its API started on a temporary port 4001 and returned HTTP 200; that temporary process was stopped after verification. Existing demo records were preserved. A new 66-file source export was generated after the category additions, including the API/model/tests and form skeleton.
+- The earlier 61-file allowlisted clean export passed `npm run setup`, `npm run build` and `npm run seed`. Its API started on a temporary port 4001 and returned HTTP 200; that temporary process was stopped after verification. Existing demo records were preserved. The current allowlist contains 75 files, including categories, the form skeleton, i18next configuration and all English/Italian namespaces.
+- The English/Italian diary dictionaries contain matching sets of **133 keys**, with no empty Italian values.
 
 ## Manual app checks
 
@@ -25,7 +26,7 @@ Using the local MongoDB fallback:
 7. Sign out and sign in again.
 8. Category/description search and unmatched-results empty state.
 9. Confirm deletion and remove only the QA record created during verification.
-10. Inspect desktop and 390 px mobile layouts, including the shared form and horizontal table scrolling.
+10. Inspect desktop and 390 px mobile layouts, including the shared form. The later card layout below 768 px removes the need for mobile table scrolling.
 11. Stop the API briefly: the table shows a useful error and Try again action; restart and retry restores the list.
 12. Reload after dependency upgrades: routing, authentication and the diary render correctly.
 13. Demo auto-fill populates both login inputs, clears validation errors and leaves sign-in to the submit button.
@@ -39,6 +40,10 @@ Using the local MongoDB fallback:
 21. Date sorting changes entries within the same calendar day by their creation timestamps. The desktop Date header switches between descending/ascending order, and the selected order carries into the mobile list. The mobile sort menu switches back to newest first and resets pagination.
 22. Focusing/tapping a date shows the record's creation time. The calendar date remains separate from record timestamps. The latest tooltip refinement displays just `HH:mm:ss`.
 23. Clear is absent when Category is empty. Switching to Income updates the form's colors/icons, while keyboard focus on the inactive Expense option retains its own brown outline.
+24. The Amount input accepts `12,34` as `12.34`. Typing letters or inserting `123.45abc` leaves the prior numeric value unchanged. `12.345` is still rejected by precision validation before an API write.
+25. Switch to Italian, reload, and verify the selected language and HTML `lang` persist. The diary, form, calendar dates, USD formatting, preset categories and pagination follow the language; user-defined names and descriptions remain unchanged. The Italian login screen also includes the control. Return to English after verification.
+26. In the Italian Other autocomplete, `tras` suggests `Trasporti`; selecting it reuses canonical `Transport` in Category and hides the optional name. Clear removes the value and its own button. A malformed amount and missing category produce Italian validation messages.
+27. At 320 and 390 px, the localized header and mobile list have no horizontal document overflow. Focusing/tapping a date produces only the local creation time, such as `13:32:34`.
 
 Local browser screenshots are under ignored `.local/screenshots`. Real user records are not exported. Screenshots from the QA cycle are local verification evidence, not submission assets.
 

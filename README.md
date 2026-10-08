@@ -2,7 +2,9 @@
 
 An authenticated expense and income diary built with React 18, Ant Design 5, Express and MongoDB/Mongoose.
 
-Users can create, read, edit and delete their own transactions. The English UI uses a table on desktop and full transaction cards below 768 px. Edit/Delete are available from each entry's three-dot menu, with confirmation before deletion. It includes a shared create/edit form with loading skeletons and type-specific colors/icons, category search, type filters and income/expense/balance totals. The category selector separates suggested categories from the user's saved custom categories.
+Users can create, read, edit and delete their own transactions. The UI uses a table on desktop and full transaction cards below 768 px. Edit/Delete are available from each entry's three-dot menu, with confirmation before deletion. It includes a shared create/edit form with loading skeletons and type-specific colors/icons, category search, type filters and income/expense/balance totals. The category selector separates suggested categories from the user's saved custom categories.
+
+The language control on sign-in and in the diary switches between English (default) and Italian, using the template's i18next architecture. The choice persists in browser storage. Labels, validation, Ant Design controls, calendar dates and USD formatting follow the selected language. Preset category labels are translated; the API retains canonical category values and user-defined names are preserved.
 
 ## Run locally
 
@@ -111,7 +113,7 @@ Example create body:
 
 `type`, `amountCents`, `category` and `date` are required at creation. `description` is optional.
 
-- Money: positive safe integers, **1–999,999,999 cents** ($0.01–$9,999,999.99); USD only. The frontend converts decimal strings to cents without floating-point multiplication.
+- Money: positive safe integers, **1–999,999,999 cents** ($0.01–$9,999,999.99); USD only. The Amount input rejects letters and accepts digits with one decimal separator (`.` or `,`). The frontend converts decimal strings to cents without floating-point multiplication and validates the range and two-decimal precision.
 - Date: a real calendar date in exact `YYYY-MM-DD` format, year 1900–9999. It is stored as a string rather than a timestamp to avoid timezone shifts.
 - Creation/edit timestamps are stored separately. The date tooltip shows only the local creation time (`HH:mm:ss`). Sorting by date uses the transaction's calendar day, then its creation timestamp and ID to order entries consistently within a day. Desktop date/amount columns and the mobile sort menu support both directions.
 - Category: trimmed, 1–64 characters; presets must match the transaction type. Custom names are normalized to Title Case, with repeated spaces collapsed. Custom categories are stored per user and type in a separate collection with a unique index, and remain available after deleting transactions.

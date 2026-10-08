@@ -9,9 +9,9 @@
     "preview": "vite preview",
     "default-theme": "node src/theme/ant.config.default.js && npx tailwindcss init --full src/theme/tailwind.config.default.js",
     "stylelint": "stylelint \"./**/*.css\"",
-    "lint": "eslint src/index.jsx src/routes/index.jsx src/routes/Home.jsx src/components/TransactionForm.jsx src/components/core/user/Login.jsx src/helpers/core/Api.jsx src/helpers/core/AuthContext.jsx src/helpers/transactions.js src/components/TransactionFormSkeleton.jsx",
-    "format": "prettier --write \"./**/*.{json,js,yml,md}\"",
-    "format:check": "prettier --check src/index.jsx src/routes/index.jsx src/routes/Home.jsx src/components/TransactionForm.jsx src/components/core/user/Login.jsx src/helpers/core/Api.jsx src/helpers/core/AuthContext.jsx src/helpers/transactions.js src/styles/app.css src/styles/style.css vite.config.mjs src/components/TransactionFormSkeleton.jsx"
+    "lint": "eslint src/index.jsx src/routes/index.jsx src/routes/Home.jsx src/components/TransactionForm.jsx src/components/core/user/Login.jsx src/helpers/core/Api.jsx src/helpers/core/AuthContext.jsx src/helpers/transactions.js src/components/TransactionFormSkeleton.jsx src/helpers/core/i18n.jsx src/components/core/controls/LanguageSelector.jsx src/config.js",
+    "format": "prettier --write src/index.jsx src/routes/index.jsx src/routes/Home.jsx src/components/TransactionForm.jsx src/components/core/user/Login.jsx src/helpers/core/Api.jsx src/helpers/core/AuthContext.jsx src/helpers/transactions.js src/styles/app.css src/styles/style.css vite.config.mjs src/components/TransactionFormSkeleton.jsx src/helpers/core/i18n.jsx src/components/core/controls/LanguageSelector.jsx src/config.js public/locales/en/diary.json public/locales/it/diary.json",
+    "format:check": "prettier --check src/index.jsx src/routes/index.jsx src/routes/Home.jsx src/components/TransactionForm.jsx src/components/core/user/Login.jsx src/helpers/core/Api.jsx src/helpers/core/AuthContext.jsx src/helpers/transactions.js src/styles/app.css src/styles/style.css vite.config.mjs src/components/TransactionFormSkeleton.jsx src/helpers/core/i18n.jsx src/components/core/controls/LanguageSelector.jsx src/config.js public/locales/en/diary.json public/locales/it/diary.json"
   },
   "browserslist": [
     "defaults"
@@ -23,8 +23,11 @@
     "antd": "^5.18.0",
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",
+    "i18next": "^26.4.2",
+    "i18next-http-backend": "^4.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-i18next": "^17.0.16",
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {

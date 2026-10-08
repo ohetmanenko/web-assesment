@@ -69,6 +69,15 @@ a {
   align-items: center;
   gap: 12px;
 }
+.language-selector {
+  width: 108px;
+  flex-shrink: 0;
+}
+.login-panel > .language-selector {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+}
 .user-avatar {
   background: #e4eeeb;
   color: #176b65;
@@ -693,6 +702,14 @@ a {
   .header-inner {
     padding: 14px 16px;
   }
+  .language-selector {
+    width: 90px;
+    font-size: 12px;
+  }
+  .login-panel > .language-selector {
+    top: 18px;
+    right: 24px;
+  }
   .brand {
     font-size: 16px;
   }
@@ -770,5 +787,17 @@ a {
   }
   .login-caption {
     bottom: 24px;
+  }
+}
+@media (max-width: 480px) {
+  .header-inner {
+    gap: 8px;
+  }
+  .header-inner .brand {
+    gap: 8px;
+    font-size: 15px;
+  }
+  .header-account .user-avatar {
+    display: none;
   }
 }

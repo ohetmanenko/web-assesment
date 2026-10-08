@@ -1,3 +1,4 @@
+import { useDiary } from '../helpers/core/i18n';
 import { useEffect, useState } from 'react';
 import {
   Alert,
@@ -22,6 +23,8 @@ import { amountToCents, centsToInput, titleCaseCategory } from '../helpers/trans
 import TransactionFormSkeleton from './TransactionFormSkeleton';
 
 const TransactionForm = ({ open, record, onClose, onSaved }) => {
+  const { t, i18n } = useDiary();
+  const categoryName = value => t('category.' + value, { defaultValue: value });
   const [form] = Form.useForm();
   const { message } = App.useApp();
   const [saving, setSaving] = useState(false);
@@ -39,8 +42,14 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
     ...(catalog?.custom[selectedType] || [])
   ];
   const presets = Object.values(catalog?.defaults || {}).flat();
-  const customPreview =
-    presets.find(name => name.toLowerCase() === customName.trim().toLowerCase()) || titleCaseCategory(customName);
+  const matchCategory = (value, names) => {
+    const normalized = titleCaseCategory(value);
+    return (
+      names.find(name => titleCaseCategory(name) === normalized) ||
+      names.find(name => titleCaseCategory(categoryName(name)) === normalized)
+    );
+  };
+  const customPreview = matchCategory(customName, presets) || titleCaseCategory(customName);
 
   useEffect(() => {
     if (!open) return;
@@ -90,6 +99,15 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
     };
   }, [open, record, reload, form]);
 
+  useEffect(() => {
+    if (!open) return;
+    const names = form
+      .getFieldsError()
+      .filter(field => field.errors.length)
+      .map(field => field.name);
+    if (names.length) form.validateFields(names).catch(() => {});
+  }, [form, open, i18n.resolvedLanguage]);
+
   const changeType = event => {
     setError('');
     const nextType = event.target.value;
@@ -119,7 +137,10 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
       amountCents: amountToCents(values.amount),
       category: values.category,
       ...(values.category === 'Other' && values.customCategoryName?.trim()
-        ? { customCategoryName: values.customCategoryName.trim() }
+        ? {
+            customCategoryName:
+              matchCategory(values.customCategoryName, available(values.type)) || values.customCategoryName.trim()
+          }
         : {}),
       date: values.date.format('YYYY-MM-DD'),
       description: (values.description || '').trim()
@@ -129,7 +150,7 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
         ? await Api.patch('/transactions/' + record._id, data)
         : await Api.post('/transactions', data);
       onSaved(response.data);
-      message.success(record ? 'Transaction updated.' : 'Transaction added.');
+      message.success(record ? t('Transaction updated.') : t('Transaction added.'));
       onClose();
     } catch (err) {
       setError(getApiError(err));
@@ -138,9 +159,17 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
     }
   };
   const options = [
-    { label: 'Suggested categories', options: (catalog?.defaults[type] || []).map(value => ({ value, label: value })) },
+    {
+      label: t('Suggested categories'),
+      options: (catalog?.defaults[type] || []).map(value => ({ value, label: categoryName(value) }))
+    },
     ...(catalog?.custom[type]?.length
-      ? [{ label: 'Your categories', options: catalog.custom[type].map(value => ({ value, label: value })) }]
+      ? [
+          {
+            label: t('Your categories'),
+            options: catalog.custom[type].map(value => ({ value, label: categoryName(value) }))
+          }
+        ]
       : [])
   ];
   const nameSuggestions = options
@@ -151,11 +180,11 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
     <ConfigProvider theme={{ token: { colorPrimary: type === 'income' ? '#176b65' : '#9d5b35' } }}>
       <Modal
         className={'transaction-modal ' + type}
-        title={record ? 'Edit transaction' : 'Add a transaction'}
+        title={record ? t('Edit transaction') : t('Add a transaction')}
         open={open}
         onCancel={onClose}
         onOk={() => form.submit()}
-        okText={record ? 'Save changes' : 'Add transaction'}
+        okText={record ? t('Save changes') : t('Add transaction')}
         okButtonProps={{ disabled: categoryLoading || !!loadError }}
         confirmLoading={saving}
         cancelButtonProps={{ disabled: saving }}
@@ -167,17 +196,17 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
       >
         <p className="form-intro transaction-direction">
           <FontAwesomeIcon icon={type === 'income' ? faArrowTrendUp : faArrowTrendDown} />
-          {type === 'income' ? 'Income · Money coming in' : 'Expense · Money going out'}
+          {type === 'income' ? t('Income · Money coming in') : t('Expense · Money going out')}
         </p>
-        {error && <Alert type="error" message={error} showIcon className="form-error" />}
+        {error && <Alert type="error" message={t(error)} showIcon className="form-error" />}
         {loadError && (
           <Alert
             type="error"
             showIcon
-            message="Could not load categories"
-            description={loadError}
+            message={t('Could not load categories')}
+            description={t(loadError)}
             className="form-error"
-            action={<Button onClick={() => setReload(value => value + 1)}>Try again</Button>}
+            action={<Button onClick={() => setReload(value => value + 1)}>{t('Try again')}</Button>}
           />
         )}
         <div aria-busy={categoryLoading}>
@@ -190,20 +219,22 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
             disabled={saving}
             style={{ display: categoryLoading || loadError ? 'none' : undefined }}
           >
-            <Form.Item name="type" label="Transaction type" rules={[{ required: true }]}>
+            <Form.Item name="type" label={t('Transaction type')} rules={[{ required: true }]}>
               <Radio.Group className="type-radio" buttonStyle="solid" onChange={changeType}>
                 <Radio.Button value="expense" className="type-option expense">
-                  <FontAwesomeIcon icon={faArrowTrendDown} className="type-option-icon expense" /> Expense
+                  <FontAwesomeIcon icon={faArrowTrendDown} className="type-option-icon expense" />
+                  {t('Expense')}
                 </Radio.Button>
                 <Radio.Button value="income" className="type-option income">
-                  <FontAwesomeIcon icon={faArrowTrendUp} className="type-option-icon income" /> Income
+                  <FontAwesomeIcon icon={faArrowTrendUp} className="type-option-icon income" />
+                  {t('Income')}
                 </Radio.Button>
               </Radio.Group>
             </Form.Item>
             <Row gutter={20}>
               <Col xs={24} sm={12}>
                 <Form.Item
-                  label="Amount (USD)"
+                  label={t('Amount (USD)')}
                   name="amount"
                   normalize={(value, previous) => {
                     const normalized = value.replace(/,/g, '.');
@@ -214,7 +245,7 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
                       validator: (_, value) =>
                         amountToCents(value) !== null
                           ? Promise.resolve()
-                          : Promise.reject(new Error('Enter $0.01–$9,999,999.99 with at most 2 decimals.'))
+                          : Promise.reject(new Error(t('Enter $0.01–$9,999,999.99 with at most 2 decimals.')))
                     }
                   ]}
                 >
@@ -222,16 +253,16 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
                     prefix="$"
                     inputMode="decimal"
                     autoComplete="off"
-                    placeholder="0.00"
+                    placeholder={t('0.00')}
                     className="full-width"
                     size="large"
                   />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12}>
-                <Form.Item label="Date" name="date" rules={[{ required: true, message: 'Choose a date.' }]}>
+                <Form.Item label={t('Date')} name="date" rules={[{ required: true, message: t('Choose a date.') }]}>
                   <DatePicker
-                    format="MMM D, YYYY"
+                    format={t('format.date')}
                     className="full-width"
                     size="large"
                     allowClear={false}
@@ -241,18 +272,18 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
               </Col>
             </Row>
             <div className="category-heading">
-              <label htmlFor="category">Category</label>
+              <label htmlFor="category">{t('Category')}</label>
               {category && (
                 <Button
                   type="text"
                   size="small"
                   htmlType="button"
-                  aria-label="Clear category"
+                  aria-label={t('Clear category')}
                   icon={<FontAwesomeIcon icon={faXmark} />}
                   disabled={saving}
                   onClick={clearCategory}
                 >
-                  Clear
+                  {t('Clear')}
                 </Button>
               )}
             </div>
@@ -260,23 +291,23 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
               <Form.Item
                 name="category"
                 rules={[
-                  { required: true, message: 'Choose a category.' },
+                  { required: true, message: t('Choose a category.') },
                   {
                     validator: (_, value) =>
                       !value || available(type).includes(value)
                         ? Promise.resolve()
-                        : Promise.reject(new Error('Choose a category for the selected transaction type.'))
+                        : Promise.reject(new Error(t('Choose a category for the selected transaction type.')))
                   }
                 ]}
-                extra={categoryNotice && <span role="status">{categoryNotice}</span>}
+                extra={categoryNotice && <span role="status">{t(categoryNotice)}</span>}
               >
                 <Select
                   id="category"
-                  aria-label="Category"
+                  aria-label={t('Category')}
                   size="large"
                   showSearch
                   options={options}
-                  placeholder="Choose a category"
+                  placeholder={t('Choose a category')}
                   optionFilterProp="label"
                   onChange={() => {
                     form.setFields([{ name: 'customCategoryName', value: undefined, errors: [] }]);
@@ -288,35 +319,52 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
                 <Form.Item
                   name="customCategoryName"
                   preserve={false}
-                  extra={customName.trim() ? 'Saved as: ' + customPreview : 'Optional. Leave blank to save as Other.'}
+                  extra={
+                    customName.trim()
+                      ? t('Saved as: {{name}}', { name: categoryName(customPreview) })
+                      : t('Optional. Leave blank to save as Other.')
+                  }
                   rules={[
-                    { max: 64, message: 'Use at most 64 characters.' },
+                    { max: 64, message: t('Use at most 64 characters.') },
                     {
                       validator: (_, value) => {
                         const name = titleCaseCategory(value || '');
-                        const preset = presets.find(item => titleCaseCategory(item) === name);
+                        const existing = matchCategory(value || '', available(type));
+                        const preset = existing
+                          ? presets.includes(existing)
+                            ? existing
+                            : undefined
+                          : matchCategory(value || '', presets);
                         return name.length <= 64 && (!preset || catalog.defaults[type].includes(preset))
                           ? Promise.resolve()
                           : Promise.reject(
-                              new Error('Use a name for the selected transaction type, up to 64 characters.')
+                              new Error(t('Use a name for the selected transaction type, up to 64 characters.'))
                             );
                       }
                     }
                   ]}
                 >
                   <AutoComplete
-                    size="large"
                     className="full-width"
                     options={nameSuggestions}
                     filterOption={(input, option) =>
                       !!option.value &&
-                      titleCaseCategory(option.value).toLowerCase().includes(titleCaseCategory(input).toLowerCase())
+                      [option.value, option.label].some(value =>
+                        titleCaseCategory(value).toLowerCase().includes(titleCaseCategory(input).toLowerCase())
+                      )
                     }
+                    onSelect={value => {
+                      form.setFields([
+                        { name: 'category', value, errors: [] },
+                        { name: 'customCategoryName', value: undefined, errors: [] }
+                      ]);
+                      setCategoryNotice('');
+                    }}
                   >
                     <Input
-                      maxLength={64}
-                      placeholder="Other name (optional)"
-                      aria-label="Other category name (optional)"
+                      size="large"
+                      placeholder={t('Other name (optional)')}
+                      aria-label={t('Other category name (optional)')}
                       autoComplete="off"
                     />
                   </AutoComplete>
@@ -326,12 +374,13 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
             <Form.Item
               label={
                 <span>
-                  Description <span className="optional-label">optional</span>
+                  {t('Description')}
+                  <span className="optional-label">{t('optional')}</span>
                 </span>
               }
               name="description"
             >
-              <Input.TextArea rows={3} maxLength={500} showCount placeholder="What was this for?" />
+              <Input.TextArea rows={3} maxLength={500} showCount placeholder={t('What was this for?')} />
             </Form.Item>
           </Form>
         </div>

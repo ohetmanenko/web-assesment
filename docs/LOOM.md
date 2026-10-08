@@ -9,6 +9,7 @@ Run MongoDB, seed, API and frontend using the README. Run `npm test`, `npm run l
 “This is Daily Ledger, a small expense and income diary. The API uses Express and Mongoose; the interface uses React and Ant Design. The demo account is seeded idempotently.”
 
 Sign in with `test@meblabs.com / testtest`. Show the first-entry empty state.
+Show the English/Italian control briefly, then return to English for the walkthrough.
 
 ## 0:30–1:30 — Create and read
 
@@ -51,7 +52,7 @@ Show the active route/controller/model/validation files. Explain:
 
 ## 3:40–4:20 — Tradeoffs
 
-“For the MVP, the list, filters and totals run on the loaded records. The next steps would be server pagination and reporting, refresh rotation and browser automation tests. I kept the UI in English and the currency in USD. I used the existing components and focused on complete CRUD and useful errors.”
+"For the MVP, the list, filters and totals run on the loaded records. The next steps would be server pagination and reporting, refresh rotation and browser automation tests. The interface supports English and Italian, and the currency remains USD. I used the existing components and focused on complete CRUD and useful errors."
 
 Mention the security cleanup only if it has already been discussed with the company; do not display or run the original payload. Use a fresh clean source export and new Git history for eventual publication.
 

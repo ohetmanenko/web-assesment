@@ -6,8 +6,10 @@ export const titleCaseCategory = value =>
     .replace(/\s+/gu, ' ')
     .toLowerCase()
     .replace(/(^|[\s\-_])\p{L}/gu, match => match.toUpperCase());
-export const formatMoney = cents =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
+export const formatMoney = (cents, language = 'en') =>
+  new Intl.NumberFormat(language === 'it' ? 'it-IT' : 'en-US', { style: 'currency', currency: 'USD' }).format(
+    cents / 100
+  );
 export const centsToInput = cents => Math.floor(cents / 100) + '.' + String(cents % 100).padStart(2, '0');
 export const amountToCents = value => {
   const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(String(value ?? ''));
