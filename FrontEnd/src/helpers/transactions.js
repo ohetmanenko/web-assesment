@@ -15,7 +15,6 @@ export const amountToCents = value => {
   const cents = Number(match[1]) * 100 + Number((match[2] || '').padEnd(2, '0'));
   return Number.isSafeInteger(cents) && cents > 0 && cents <= MAX_AMOUNT_CENTS ? cents : null;
 };
-export const sortTransactions = records =>
-  [...records].sort(
-    (a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt) || b._id.localeCompare(a._id)
-  );
+export const compareTransactionDates = (a, b) =>
+  a.date.localeCompare(b.date) || a.createdAt.localeCompare(b.createdAt) || a._id.localeCompare(b._id);
+export const sortTransactions = records => [...records].sort((a, b) => compareTransactionDates(b, a));

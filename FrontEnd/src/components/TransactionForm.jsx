@@ -8,7 +8,6 @@ import {
   DatePicker,
   Form,
   Input,
-  InputNumber,
   Modal,
   Radio,
   Row,
@@ -206,6 +205,10 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
                 <Form.Item
                   label="Amount (USD)"
                   name="amount"
+                  normalize={(value, previous) => {
+                    const normalized = value.replace(/,/g, '.');
+                    return /^\d*(?:\.\d*)?$/.test(normalized) ? normalized : previous || '';
+                  }}
                   rules={[
                     {
                       validator: (_, value) =>
@@ -215,11 +218,10 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
                     }
                   ]}
                 >
-                  <InputNumber
-                    stringMode
+                  <Input
                     prefix="$"
-                    min="0.01"
-                    max="9999999.99"
+                    inputMode="decimal"
+                    autoComplete="off"
                     placeholder="0.00"
                     className="full-width"
                     size="large"

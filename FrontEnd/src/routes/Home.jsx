@@ -1,5 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, App, Avatar, Button, Card, Empty, Input, Popconfirm, Segmented, Table, Tag, Tooltip } from 'antd';
+import {
+  Alert,
+  App,
+  Avatar,
+  Button,
+  Card,
+  Dropdown,
+  Empty,
+  Grid,
+  Input,
+  Modal,
+  Pagination,
+  Segmented,
+  Skeleton,
+  Table,
+  Tag,
+  Tooltip
+} from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBookOpen,
@@ -9,6 +26,8 @@ import {
   faWallet,
   faPen,
   faTrash,
+  faEllipsisVertical,
+  faSort,
   faRotateRight,
   faArrowRightFromBracket,
   faMagnifyingGlass
@@ -16,12 +35,23 @@ import {
 import dayjs from 'dayjs';
 import { useAuth } from '../helpers/core/AuthContext';
 import Api, { getApiError } from '../helpers/core/Api';
-import { formatMoney, sortTransactions } from '../helpers/transactions';
+import { compareTransactionDates, formatMoney, sortTransactions } from '../helpers/transactions';
 import TransactionForm from '../components/TransactionForm';
+
+const sortOptions = [
+  { key: 'date:descend', label: 'Newest first' },
+  { key: 'date:ascend', label: 'Oldest first' },
+  { key: 'amountCents:descend', label: 'Amount: high to low' },
+  { key: 'amountCents:ascend', label: 'Amount: low to high' }
+];
+const compareAmounts = (a, b) => a.amountCents - b.amountCents || compareTransactionDates(a, b);
+const formatTimestamp = value => dayjs(value).format('HH:mm:ss');
 
 const Home = () => {
   const { logged, signOut } = useAuth();
   const { message } = App.useApp();
+  const screens = Grid.useBreakpoint();
+  const mobile = !screens.md;
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -30,6 +60,9 @@ const Home = () => {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [page, setPage] = useState(1);
+  const [sorting, setSorting] = useState({ field: 'date', order: 'descend' });
   const [signingOut, setSigningOut] = useState(false);
 
   const load = useCallback(async () => {
@@ -68,6 +101,15 @@ const Home = () => {
       }),
     [records, search, type]
   );
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(filtered.length / 8)));
+  const ordered = useMemo(() => {
+    const compare = sorting.field === 'date' ? compareTransactionDates : compareAmounts;
+    return [...filtered].sort((a, b) => (sorting.order === 'ascend' ? compare(a, b) : compare(b, a)));
+  }, [filtered, sorting]);
+  const changeSort = (field, order) => {
+    setSorting({ field, order });
+    setPage(1);
+  };
 
   const add = () => {
     setEditing(null);
@@ -85,6 +127,7 @@ const Home = () => {
     try {
       await Api.delete('/transactions/' + record._id);
       setRecords(previous => previous.filter(item => item._id !== record._id));
+      setDeleteTarget(null);
       message.success('Transaction deleted.');
     } catch (error) {
       message.error(getApiError(error));
@@ -102,6 +145,49 @@ const Home = () => {
       setSigningOut(false);
     }
   };
+
+  const transactionActions = record => (
+    <Dropdown
+      trigger={['click']}
+      placement="bottomRight"
+      menu={{
+        items: [
+          { key: 'edit', label: 'Edit', icon: <FontAwesomeIcon icon={faPen} /> },
+          { key: 'delete', label: 'Delete', danger: true, icon: <FontAwesomeIcon icon={faTrash} /> }
+        ],
+        onClick: ({ key }) => (key === 'edit' ? edit(record) : setDeleteTarget(record))
+      }}
+    >
+      <Button
+        type="text"
+        className="transaction-actions-trigger"
+        aria-label={'Actions for ' + record.category}
+        disabled={deleting !== null}
+        icon={<FontAwesomeIcon icon={faEllipsisVertical} />}
+      />
+    </Dropdown>
+  );
+
+  const transactionDate = record => (
+    <Tooltip trigger={['hover', 'focus']} title={formatTimestamp(record.createdAt)}>
+      <time className="date-cell transaction-date" dateTime={record.date} tabIndex={0}>
+        {dayjs(record.date).format('MMM D, YYYY')}
+      </time>
+    </Tooltip>
+  );
+
+  const emptyState = (
+    <Empty
+      image={Empty.PRESENTED_IMAGE_SIMPLE}
+      description={records.length ? 'No transactions match your search.' : 'Your diary starts with the first entry.'}
+    >
+      {!records.length && !loadError && (
+        <Button type="primary" onClick={add}>
+          Add your first transaction
+        </Button>
+      )}
+    </Empty>
+  );
 
   const columns = [
     {
@@ -124,8 +210,9 @@ const Home = () => {
       title: 'DATE',
       dataIndex: 'date',
       width: 160,
-      sorter: (a, b) => a.date.localeCompare(b.date),
-      render: date => <span className="date-cell">{dayjs(date).format('MMM D, YYYY')}</span>
+      sorter: compareTransactionDates,
+      sortOrder: sorting.field === 'date' ? sorting.order : null,
+      render: (_, record) => transactionDate(record)
     },
     {
       title: 'TYPE',
@@ -138,7 +225,8 @@ const Home = () => {
       dataIndex: 'amountCents',
       align: 'right',
       width: 170,
-      sorter: (a, b) => a.amountCents - b.amountCents,
+      sorter: compareAmounts,
+      sortOrder: sorting.field === 'amountCents' ? sorting.order : null,
       render: (value, record) => (
         <span className={'amount-cell ' + record.type}>
           {record.type === 'income' ? '+' : '−'}
@@ -150,35 +238,8 @@ const Home = () => {
       title: 'ACTIONS',
       key: 'actions',
       align: 'right',
-      width: 112,
-      render: (_, record) => (
-        <div className="row-actions">
-          <Tooltip title="Edit transaction">
-            <Button
-              type="text"
-              aria-label={'Edit ' + record.category}
-              onClick={() => edit(record)}
-              icon={<FontAwesomeIcon icon={faPen} />}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Delete this transaction?"
-            description={record.category + ' · ' + formatMoney(record.amountCents)}
-            okText="Delete"
-            cancelText="Keep it"
-            okButtonProps={{ danger: true, loading: deleting === record._id }}
-            onConfirm={() => remove(record)}
-          >
-            <Button
-              type="text"
-              danger
-              aria-label={'Delete ' + record.category}
-              disabled={deleting !== null}
-              icon={<FontAwesomeIcon icon={faTrash} />}
-            />
-          </Popconfirm>
-        </div>
-      )
+      width: 80,
+      render: (_, record) => transactionActions(record)
     }
   ];
 
@@ -278,13 +339,23 @@ const Home = () => {
             </Tooltip>
           </div>
           <div className="table-toolbar">
-            <Segmented options={['All', 'Income', 'Expense']} value={type} onChange={setType} />
+            <Segmented
+              options={['All', 'Income', 'Expense']}
+              value={type}
+              onChange={value => {
+                setType(value);
+                setPage(1);
+              }}
+            />
             <Input
               aria-label="Search transactions"
               placeholder="Search category or description…"
               prefix={<FontAwesomeIcon icon={faMagnifyingGlass} />}
               value={search}
-              onChange={event => setSearch(event.target.value)}
+              onChange={event => {
+                setSearch(event.target.value);
+                setPage(1);
+              }}
               allowClear
               className="transaction-search"
             />
@@ -299,30 +370,97 @@ const Home = () => {
               action={<Button onClick={load}>Try again</Button>}
             />
           )}
-          <Table
-            rowKey="_id"
-            columns={columns}
-            dataSource={filtered}
-            loading={loading}
-            scroll={{ x: 820 }}
-            pagination={{ pageSize: 8, showSizeChanger: false, hideOnSinglePage: true }}
-            locale={{
-              emptyText: (
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description={
-                    records.length ? 'No transactions match your search.' : 'Your diary starts with the first entry.'
-                  }
+          {mobile ? (
+            <div className="mobile-transactions" aria-busy={loading}>
+              <div className="mobile-sort-controls">
+                <Dropdown
+                  trigger={['click']}
+                  menu={{
+                    items: sortOptions,
+                    selectable: true,
+                    selectedKeys: [sorting.field + ':' + sorting.order],
+                    onClick: ({ key }) => changeSort(...key.split(':'))
+                  }}
                 >
-                  {!records.length && !loadError && (
-                    <Button type="primary" onClick={add}>
-                      Add your first transaction
-                    </Button>
-                  )}
-                </Empty>
-              )
-            }}
-          />
+                  <Button
+                    type="text"
+                    size="small"
+                    aria-label="Sort transactions"
+                    disabled={loading || !records.length}
+                    icon={<FontAwesomeIcon icon={faSort} />}
+                  >
+                    {sortOptions.find(option => option.key === sorting.field + ':' + sorting.order).label}
+                  </Button>
+                </Dropdown>
+              </div>
+              {loading ? (
+                <div role="status" aria-label="Loading transactions">
+                  <span className="sr-only">Loading transactions…</span>
+                  {[0, 1, 2].map(key => (
+                    <div className="transaction-card" key={key} aria-hidden="true">
+                      <Skeleton active title={{ width: '40%' }} paragraph={{ rows: 2 }} />
+                    </div>
+                  ))}
+                </div>
+              ) : filtered.length ? (
+                <>
+                  <ul className="transaction-card-list" aria-label="Transactions">
+                    {ordered.slice((currentPage - 1) * 8, currentPage * 8).map(record => (
+                      <li className={'transaction-card ' + record.type} key={record._id}>
+                        <div className="transaction-card-top">
+                          <Tag className={'type-tag ' + record.type}>
+                            <FontAwesomeIcon icon={record.type === 'income' ? faArrowTrendUp : faArrowTrendDown} />
+                            {record.type === 'income' ? 'Income' : 'Expense'}
+                          </Tag>
+                          <span className={'amount-cell ' + record.type}>
+                            {record.type === 'income' ? '+' : '−'}
+                            {formatMoney(record.amountCents)}
+                          </span>
+                          {transactionActions(record)}
+                        </div>
+                        <div className="transaction-card-category">
+                          <strong>{record.category}</strong>
+                          {transactionDate(record)}
+                        </div>
+                        <p className="transaction-card-description">{record.description || 'No description'}</p>
+                      </li>
+                    ))}
+                  </ul>
+                  <Pagination
+                    current={currentPage}
+                    total={filtered.length}
+                    pageSize={8}
+                    showSizeChanger={false}
+                    hideOnSinglePage
+                    onChange={setPage}
+                    size="small"
+                  />
+                </>
+              ) : (
+                emptyState
+              )}
+            </div>
+          ) : (
+            <Table
+              rowKey="_id"
+              columns={columns}
+              dataSource={ordered}
+              loading={loading}
+              scroll={{ x: 820 }}
+              sortDirections={['descend', 'ascend', 'descend']}
+              onChange={(_, __, sorter, extra) => {
+                if (extra.action === 'sort') changeSort(sorter.field, sorter.order);
+              }}
+              pagination={{
+                current: currentPage,
+                onChange: setPage,
+                pageSize: 8,
+                showSizeChanger: false,
+                hideOnSinglePage: true
+              }}
+              locale={{ emptyText: emptyState }}
+            />
+          )}
           <div className="table-footer">
             <span>
               {filtered.length} of {records.length} transactions
@@ -336,6 +474,22 @@ const Home = () => {
         </footer>
       </main>
       <TransactionForm open={open} record={editing} onClose={() => setOpen(false)} onSaved={saved} />
+      <Modal
+        title="Delete this transaction?"
+        open={!!deleteTarget}
+        onOk={() => remove(deleteTarget)}
+        onCancel={() => setDeleteTarget(null)}
+        okText="Delete"
+        cancelText="Keep it"
+        okButtonProps={{ danger: true }}
+        confirmLoading={deleting !== null}
+        cancelButtonProps={{ disabled: deleting !== null }}
+        closable={deleting === null}
+        maskClosable={deleting === null}
+        keyboard={deleting === null}
+      >
+        {deleteTarget && <p>{deleteTarget.category + ' · ' + formatMoney(deleteTarget.amountCents)}</p>}
+      </Modal>
     </div>
   );
 };

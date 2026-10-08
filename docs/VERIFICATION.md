@@ -35,6 +35,10 @@ Using the local MongoDB fallback:
 17. Editing an older income record with Food & drinks clears its incompatible category and prompts for a replacement. Cancelling preserves the saved record.
 18. The extended form stacks amount/date at 390 px width and keeps its footer buttons reachable by scrolling or keyboard focus.
 19. At 1024 px, Category and the optional Other name share one row; at 390 px, they stack without overflowing the form. Typing `pEt` suggests the user's existing `Pet Care` expense category, and selecting it shows the same Title Case name. Switching to Income clears the draft and excludes that expense-only suggestion.
+20. The current mobile list uses full transaction cards below 768 px. Type comes first, followed by category/date on one line; descriptions wrap. At 390 px, the card list and page have no horizontal overflow. Edit opens the shared form from the three-dot menu; Delete opens a confirmation that can be cancelled with Keep it.
+21. Date sorting changes entries within the same calendar day by their creation timestamps. The desktop Date header switches between descending/ascending order, and the selected order carries into the mobile list. The mobile sort menu switches back to newest first and resets pagination.
+22. Focusing/tapping a date shows the record's creation time. The calendar date remains separate from record timestamps. The latest tooltip refinement displays just `HH:mm:ss`.
+23. Clear is absent when Category is empty. Switching to Income updates the form's colors/icons, while keyboard focus on the inactive Expense option retains its own brown outline.
 
 Local browser screenshots are under ignored `.local/screenshots`. Real user records are not exported. Screenshots from the QA cycle are local verification evidence, not submission assets.
 

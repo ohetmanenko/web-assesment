@@ -2,7 +2,7 @@
 
 An authenticated expense and income diary built with React 18, Ant Design 5, Express and MongoDB/Mongoose.
 
-Users can create, read, edit and delete their own transactions. The English UI includes a responsive table, a shared create/edit form with loading skeletons and type-specific colors/icons, deletion confirmation, category search, type filters and income/expense/balance totals. The category selector separates suggested categories from the user's saved custom categories.
+Users can create, read, edit and delete their own transactions. The English UI uses a table on desktop and full transaction cards below 768 px. Edit/Delete are available from each entry's three-dot menu, with confirmation before deletion. It includes a shared create/edit form with loading skeletons and type-specific colors/icons, category search, type filters and income/expense/balance totals. The category selector separates suggested categories from the user's saved custom categories.
 
 ## Run locally
 
@@ -113,6 +113,7 @@ Example create body:
 
 - Money: positive safe integers, **1–999,999,999 cents** ($0.01–$9,999,999.99); USD only. The frontend converts decimal strings to cents without floating-point multiplication.
 - Date: a real calendar date in exact `YYYY-MM-DD` format, year 1900–9999. It is stored as a string rather than a timestamp to avoid timezone shifts.
+- Creation/edit timestamps are stored separately. The date tooltip shows only the local creation time (`HH:mm:ss`). Sorting by date uses the transaction's calendar day, then its creation timestamp and ID to order entries consistently within a day. Desktop date/amount columns and the mobile sort menu support both directions.
 - Category: trimmed, 1–64 characters; presets must match the transaction type. Custom names are normalized to Title Case, with repeated spaces collapsed. Custom categories are stored per user and type in a separate collection with a unique index, and remain available after deleting transactions.
 - Choosing **Other** reveals an optional name field. Send `"category": "Other", "customCategoryName": "pet care"` to save the transaction as **Pet Care** and register that name for reuse. An omitted or blank name saves **Other**. `customCategoryName` is accepted only alongside **Other** and is not included in the stored transaction or its response. Entering a same-type preset name reuses that preset.
 - Changing transaction type clears an incompatible selected category and any unfinished custom name in the form. **Other** is shared; a custom name can be retained if it is already registered for both types. The API rejects type changes that silently retain incompatible categories. Legacy custom values remain available; editing an incompatible legacy preset prompts for a valid category.

@@ -22,19 +22,19 @@ Show the type filter and category/description search.
 
 ## 1:30–2:20 — Edit, validate and delete
 
-Edit Lunch to $15.50 and change its description.
+Open the expense's three-dot menu, choose Edit, then change Lunch to $15.50 and update its description.
 Expected: same record updated, no duplicate, recalculated totals.
 
 Enter `12.345` in the form.
 Expected: validation error and no API write. Show the error, then cancel.
 
-Delete the expense.
+Open the expense's three-dot menu and choose Delete.
 Expected: confirmation first, then the row disappears and totals update. Show both stages.
 
 ## 2:20–2:50 — Persistence and mobile
 
 Reload the page. Expected: income still present and session retained.
-Show a narrow browser viewport: cards stack, the form fits and the table scrolls horizontally.
+Show a narrow browser viewport: transaction cards show type first, then category/date on one line, with a full wrapped description and a three-dot actions menu. Show the date tooltip with the creation time, switch between newest/oldest sorting, and confirm the form fits without horizontal scrolling.
 Sign out and sign back in. Expected: same saved records.
 
 ## 2:50–3:40 — API tests and structure

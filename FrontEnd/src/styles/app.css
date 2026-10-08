@@ -282,6 +282,16 @@ a {
   color: #76808a;
   font-size: 12px;
 }
+.transaction-date {
+  cursor: help;
+  text-decoration: underline dotted #c7d0d5;
+  text-underline-offset: 4px;
+}
+.transaction-date:focus-visible {
+  outline: 2px solid #176b65;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
 .type-tag {
   border: 0;
   border-radius: 5px;
@@ -308,16 +318,75 @@ a {
 .amount-cell.expense {
   color: #5f6974;
 }
-.row-actions {
+.transaction-actions-trigger {
+  color: #88939c;
+}
+.mobile-transactions {
+  padding: 0 16px 18px;
+}
+.mobile-sort-controls {
   display: flex;
   justify-content: flex-end;
-  gap: 3px;
+  margin-bottom: 12px;
 }
-.row-actions .ant-btn {
+.transaction-card-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.transaction-card {
+  padding: 12px 14px 16px;
+  margin-bottom: 12px;
+  border: 1px solid #e5e9eb;
+  border-radius: 10px;
+}
+.transaction-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.transaction-card-top .type-tag svg {
+  margin-right: 6px;
+}
+.transaction-card-top .amount-cell {
+  margin-left: auto;
+  overflow-wrap: anywhere;
+}
+.transaction-card-top .transaction-actions-trigger {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  margin-right: -8px;
+}
+.transaction-card-category {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 8px;
+}
+.transaction-card-category strong {
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.transaction-card-category time {
+  white-space: nowrap;
+  font-size: 11px;
+}
+.transaction-card-description {
+  margin: 10px 0 0;
+  color: #76808a;
   font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
-.row-actions .ant-btn:not(.ant-btn-dangerous) {
-  color: #88939c;
+.mobile-transactions .ant-pagination {
+  margin: 16px 0 0;
+  display: flex;
+  justify-content: center;
 }
 .table-footer {
   padding: 15px 24px;
