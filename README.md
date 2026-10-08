@@ -10,6 +10,8 @@ The language control on sign-in and in the diary switches between English (defau
 
 The [final report guide](docs/reports/README.md) links comprehensive [English](docs/reports/FINAL_REPORT_EN.md) and [Ukrainian](docs/reports/FINAL_REPORT_UK.md) reports, with architecture diagrams, implementation cases, final review fixes, verification limits and 16 interview questions. Equivalent PDFs accompany the local delivery package.
 
+For a populated recording, run `npm run seed:demo` after MongoDB starts. This adds 28 realistic fictional transactions to the demo account without overwriting existing records or edits. Repeat runs preserve existing fixture IDs. See [demo data and recording cases](docs/DEMO_CASES.md) for expected results, totals and a 4–5 minute route.
+
 ## Run locally
 
 Requirements: Node.js **20.19+ (20.x)** or **22.12+**, and npm; tested with **Node 22.23.2**. Docker Desktop must be running in Linux containers mode. On Windows, finish its WSL 2 setup and restart Windows if requested. `docker version` must show both Client and Server.

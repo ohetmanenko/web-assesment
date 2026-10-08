@@ -1,0 +1,254 @@
+[
+  {
+    "key": "payroll-1",
+    "daysAgo": 28,
+    "time": "08:00",
+    "type": "income",
+    "amountCents": 320000,
+    "category": "Salary",
+    "description": "Biweekly payroll — net pay"
+  },
+  {
+    "key": "rent",
+    "daysAgo": 27,
+    "time": "09:15",
+    "type": "expense",
+    "amountCents": 145000,
+    "category": "Home",
+    "description": "Monthly rent — one-bedroom apartment"
+  },
+  {
+    "key": "health-insurance",
+    "daysAgo": 25,
+    "time": "08:30",
+    "type": "expense",
+    "amountCents": 12640,
+    "category": "Health",
+    "description": "Monthly health insurance premium"
+  },
+  {
+    "key": "electricity",
+    "daysAgo": 24,
+    "time": "10:20",
+    "type": "expense",
+    "amountCents": 8976,
+    "category": "Home",
+    "description": "Electricity bill — previous month"
+  },
+  {
+    "key": "internet",
+    "daysAgo": 23,
+    "time": "09:45",
+    "type": "expense",
+    "amountCents": 6500,
+    "category": "Home",
+    "description": "Home internet — monthly plan"
+  },
+  {
+    "key": "groceries-1",
+    "daysAgo": 22,
+    "time": "17:40",
+    "type": "expense",
+    "amountCents": 9642,
+    "category": "Food & drinks",
+    "description": "Weekly groceries — produce, chicken, rice and pantry staples"
+  },
+  {
+    "key": "fuel",
+    "daysAgo": 21,
+    "time": "07:50",
+    "type": "expense",
+    "amountCents": 3850,
+    "category": "Transport",
+    "description": "Gas station — fuel for the work commute"
+  },
+  {
+    "key": "coffee-1",
+    "daysAgo": 20,
+    "time": "08:25",
+    "type": "expense",
+    "amountCents": 575,
+    "category": "Food & drinks",
+    "description": "Coffee and a pastry before work"
+  },
+  {
+    "key": "household",
+    "daysAgo": 19,
+    "time": "15:10",
+    "type": "expense",
+    "amountCents": 3489,
+    "category": "Shopping",
+    "description": "Household supplies — detergent, paper towels and light bulbs"
+  },
+  {
+    "key": "lunch",
+    "daysAgo": 18,
+    "time": "12:35",
+    "type": "expense",
+    "amountCents": 1640,
+    "category": "Food & drinks",
+    "description": "Lunch near the office — sandwich and iced tea"
+  },
+  {
+    "key": "pharmacy",
+    "daysAgo": 17,
+    "time": "18:05",
+    "type": "expense",
+    "amountCents": 2249,
+    "category": "Health",
+    "description": "Pharmacy — allergy medication and first-aid supplies"
+  },
+  {
+    "key": "groceries-2",
+    "daysAgo": 16,
+    "time": "16:20",
+    "type": "expense",
+    "amountCents": 7865,
+    "category": "Food & drinks",
+    "description": "Weekly groceries — fruit, dairy and ingredients for meal prep"
+  },
+  {
+    "key": "streaming",
+    "daysAgo": 15,
+    "time": "06:00",
+    "type": "expense",
+    "amountCents": 1599,
+    "category": "Entertainment",
+    "description": "Monthly streaming subscription"
+  },
+  {
+    "key": "payroll-2",
+    "daysAgo": 14,
+    "time": "08:00",
+    "type": "income",
+    "amountCents": 320000,
+    "category": "Salary",
+    "description": "Biweekly payroll — net pay"
+  },
+  {
+    "key": "dinner",
+    "daysAgo": 13,
+    "time": "19:30",
+    "type": "expense",
+    "amountCents": 5840,
+    "category": "Food & drinks",
+    "description": "Dinner for two — neighborhood restaurant, including tip"
+  },
+  {
+    "key": "book",
+    "daysAgo": 12,
+    "time": "14:10",
+    "type": "expense",
+    "amountCents": 2495,
+    "category": "Shopping",
+    "description": "Paperback book from a local bookstore"
+  },
+  {
+    "key": "transit-pass",
+    "daysAgo": 11,
+    "time": "07:30",
+    "type": "expense",
+    "amountCents": 2500,
+    "category": "Transport",
+    "description": "Public transit card reload"
+  },
+  {
+    "key": "dentist",
+    "daysAgo": 10,
+    "time": "11:20",
+    "type": "expense",
+    "amountCents": 4500,
+    "category": "Health",
+    "description": "Dental checkup — insurance copay"
+  },
+  {
+    "key": "freelance",
+    "daysAgo": 9,
+    "time": "13:45",
+    "type": "income",
+    "amountCents": 67500,
+    "category": "Freelance",
+    "description": "Freelance invoice paid — landing page design and revisions"
+  },
+  {
+    "key": "pet-food",
+    "daysAgo": 8,
+    "time": "16:50",
+    "type": "expense",
+    "amountCents": 4299,
+    "category": "Pet Care",
+    "description": "Dog food and treats — monthly restock"
+  },
+  {
+    "key": "groceries-3",
+    "daysAgo": 7,
+    "time": "17:15",
+    "type": "expense",
+    "amountCents": 11237,
+    "category": "Food & drinks",
+    "description": "Weekly groceries — larger shop for the coming week"
+  },
+  {
+    "key": "dividend",
+    "daysAgo": 6,
+    "time": "10:00",
+    "type": "income",
+    "amountCents": 4275,
+    "category": "Investments",
+    "description": "Quarterly dividend credited to brokerage cash balance"
+  },
+  {
+    "key": "birthday-gift",
+    "daysAgo": 5,
+    "time": "15:30",
+    "type": "expense",
+    "amountCents": 3500,
+    "category": "Shopping",
+    "description": "Birthday gift for a friend"
+  },
+  {
+    "key": "gym",
+    "daysAgo": 4,
+    "time": "06:15",
+    "type": "expense",
+    "amountCents": 3999,
+    "category": "Gym Membership",
+    "description": "Monthly gym membership"
+  },
+  {
+    "key": "takeout",
+    "daysAgo": 3,
+    "time": "18:40",
+    "type": "expense",
+    "amountCents": 2875,
+    "category": "Food & drinks",
+    "description": "Takeout after work — rice bowl and delivery tip"
+  },
+  {
+    "key": "cashback",
+    "daysAgo": 2,
+    "time": "09:00",
+    "type": "income",
+    "amountCents": 1842,
+    "category": "Refunds",
+    "description": "Credit card cashback deposited into checking"
+  },
+  {
+    "key": "bus-today",
+    "daysAgo": 0,
+    "time": "08:10",
+    "type": "expense",
+    "amountCents": 380,
+    "category": "Transport",
+    "description": "Morning bus fare to the office"
+  },
+  {
+    "key": "coffee-today",
+    "daysAgo": 0,
+    "time": "08:35",
+    "type": "expense",
+    "amountCents": 575,
+    "category": "Food & drinks",
+    "description": "Morning cappuccino at the corner cafe"
+  }
+]

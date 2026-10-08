@@ -37,3 +37,5 @@ The reports cover the same implementation and evidence. They distinguish require
 - Both reports explain AI assistance and the absence of an audited two-hour completion claim.
 
 See [verification](../VERIFICATION.md), [security notes](../SECURITY.md), [Loom script](../LOOM.md), and the root [startup instructions](../../README.md).
+
+Post-report demonstration preparation: [28 fictional transactions and 14 recording cases](../DEMO_CASES.md). Run `npm run seed:demo` to populate a fresh demo database without overwriting existing records or edits.

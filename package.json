@@ -18,6 +18,7 @@
     "format:check": "npm run format:check --prefix Api && npm run format:check --prefix FrontEnd",
     "build": "npm run build --prefix FrontEnd",
     "db:local": "npm run db:local --prefix Api",
-    "export:clean": "node scripts/export-clean.cjs"
+    "export:clean": "node scripts/export-clean.cjs",
+    "seed:demo": "npm run seed && npm run seed:demo --prefix Api"
   }
 }

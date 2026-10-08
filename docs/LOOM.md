@@ -4,11 +4,13 @@
 
 Run MongoDB, seed, API and frontend using the README. Run `npm test`, `npm run lint` and `npm run build`. Use invented demo records, close unrelated tabs and keep env files/secrets off-screen.
 
+Run `npm run seed:demo` for 28 realistic fictional transactions. Follow [the recording cases](DEMO_CASES.md) for exact inputs, expected results and narration. Existing records are preserved; absolute dashboard totals include them.
+
 ## 0:00–0:30 — Goal and sign-in
 
 “This is Daily Ledger, a small expense and income diary. The API uses Express and Mongoose; the interface uses React and Ant Design. The demo account is seeded idempotently.”
 
-Sign in with `test@meblabs.com / testtest`. Show the first-entry empty state.
+Sign in with `test@meblabs.com / testtest`. Show the populated diary with payroll, rent, groceries and everyday expenses.
 Show the English/Italian control briefly, then return to English for the walkthrough.
 
 ## 0:30–1:30 — Create and read
