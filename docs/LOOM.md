@@ -28,8 +28,9 @@ Show the type filter and category/description search.
 Open the expense's three-dot menu, choose Edit, then change Lunch to $15.50 and update its description.
 Expected: same record updated, no duplicate, recalculated totals.
 
-Enter `12.345` in the form.
+Clear the amount, enter `0` and attempt to save.
 Expected: validation error and no API write. Show the error, then cancel.
+Show cents-first typing briefly: `1` → `0.01`, `15` → `0.15`, `156` → `1.56`, `1564` → `15.64`. For $12.34, type `1234`.
 
 Open the expense's three-dot menu and choose Delete.
 Expected: confirmation first, then the row disappears and totals update. Show both stages.
@@ -44,6 +45,8 @@ Sign out and sign back in. Expected: same saved records.
 
 Show `npm test` and the three suites: auth, transactions and categories.
 Explain the 69 API tests: real MongoDB CRUD, invalid sums/dates, missing records, token/password failures, type/category validation, Title Case normalization, user isolation, stable ordering and concurrent classification conflicts. Briefly show the seven frontend session tests, including refresh/logout races and business failures after successful refresh.
+
+Eight additional frontend tests cover cents-first amount input, backspace, pasted decimals, invalid characters and amount boundaries; the frontend runner now executes 15 tests.
 
 Show the active route/controller/model/validation files. Explain:
 

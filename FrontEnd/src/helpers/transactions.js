@@ -1,4 +1,5 @@
-export const MAX_AMOUNT_CENTS = 999999999;
+import { MAX_AMOUNT_CENTS } from './amount-input.mjs';
+export { MAX_AMOUNT_CENTS, centsToInput } from './amount-input.mjs';
 export const titleCaseCategory = value =>
   value
     .normalize('NFKC')
@@ -10,7 +11,6 @@ export const formatMoney = (cents, language = 'en') =>
   new Intl.NumberFormat(language === 'it' ? 'it-IT' : 'en-US', { style: 'currency', currency: 'USD' }).format(
     cents / 100
   );
-export const centsToInput = cents => Math.floor(cents / 100) + '.' + String(cents % 100).padStart(2, '0');
 export const amountToCents = value => {
   const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(String(value ?? ''));
   if (!match) return null;

@@ -80,7 +80,7 @@ npm run format:check
 npm run build
 ```
 
-The root test command runs **69 API integration tests** with Jest + Supertest against isolated MongoDB processes and **7 frontend session tests** with Node's native runner and actual Axios interceptors. They never use the development database or Docker. API cases include password hashing/login, invalid/expired tokens, POST refresh/logout, complete CRUD, exact cents, leap dates, malformed/missing IDs, category normalization/type consistency, ownership, deterministic ordering and concurrent reclassification. Frontend cases cover shared refresh, retry failures, transient refresh errors, logout ordering, stale bootstrap and disposal. First API test execution downloads a MongoDB binary; later runs reuse its cache.
+The root test command runs **69 API integration tests** with Jest + Supertest against isolated MongoDB processes and **15 frontend tests (7 session + 8 amount-input)** with Node's native runner and actual Axios interceptors. They never use the development database or Docker. API cases include password hashing/login, invalid/expired tokens, POST refresh/logout, complete CRUD, exact cents, leap dates, malformed/missing IDs, category normalization/type consistency, ownership, deterministic ordering and concurrent reclassification. Frontend cases cover shared refresh, retry failures, transient refresh errors, logout ordering, stale bootstrap, disposal and cents-first entry/paste/backspace/boundaries. First API test execution downloads a MongoDB binary; later runs reuse its cache.
 
 Production output is `FrontEnd/dist`. The Vite build reports a large chunk warning; bundle splitting is a possible follow-up for this small MVP.
 
@@ -119,7 +119,7 @@ Example create body:
 
 `type`, `amountCents`, `category` and `date` are required at creation. `description` is optional.
 
-- Money: positive safe integers, **1–999,999,999 cents** ($0.01–$9,999,999.99); USD only. The Amount input rejects letters and accepts digits with one decimal separator (`.` or `,`). The frontend converts decimal strings to cents without floating-point multiplication and validates the range and two-decimal precision.
+- Money: positive safe integers, **1–999,999,999 cents** ($0.01–$9,999,999.99); USD only. The Amount input accumulates digits from cents: `1` → `0.01`, `15` → `0.15`, `1564` → `15.64`. Backspace removes the last digit; letters and overflow are rejected. Pasting explicit decimals such as `15.64` or `15,64` is supported; pasted excess precision is rejected. The frontend converts decimal strings to cents without floating-point multiplication and validates the range and two-decimal precision.
 - Date: a real calendar date in exact `YYYY-MM-DD` format, year 1900–9999. It is stored as a string rather than a timestamp to avoid timezone shifts.
 - Creation/edit timestamps are stored separately. The date tooltip shows only the local creation time (`HH:mm:ss`). Sorting by date uses the transaction's calendar day, then its creation timestamp and ID to order entries consistently within a day. Desktop date/amount columns and the mobile sort menu support both directions.
 - Category: trimmed, 1–64 characters; presets must match the transaction type. Custom names are normalized to Title Case, with repeated spaces collapsed. Custom categories are stored per user and type in a separate collection with a unique index, and remain available after deleting transactions.

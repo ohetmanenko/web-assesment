@@ -21,6 +21,7 @@ import dayjs from 'dayjs';
 import Api, { getApiError } from '../helpers/core/Api';
 import { amountToCents, centsToInput, titleCaseCategory } from '../helpers/transactions';
 import TransactionFormSkeleton from './TransactionFormSkeleton';
+import CentsInput from './CentsInput';
 
 const TransactionForm = ({ open, record, onClose, onSaved }) => {
   const { t, i18n } = useDiary();
@@ -240,10 +241,7 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
                 <Form.Item
                   label={t('Amount (USD)')}
                   name="amount"
-                  normalize={(value, previous) => {
-                    const normalized = value.replace(/,/g, '.');
-                    return /^\d*(?:\.\d*)?$/.test(normalized) ? normalized : previous || '';
-                  }}
+                  extra={t('Type digits; the last two are cents.')}
                   rules={[
                     {
                       validator: (_, value) =>
@@ -253,14 +251,7 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
                     }
                   ]}
                 >
-                  <Input
-                    prefix="$"
-                    inputMode="decimal"
-                    autoComplete="off"
-                    placeholder={t('0.00')}
-                    className="full-width"
-                    size="large"
-                  />
+                  <CentsInput placeholder={t('0.00')} className="full-width" size="large" />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12}>

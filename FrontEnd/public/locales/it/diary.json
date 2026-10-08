@@ -133,5 +133,6 @@
   "category.Gift": "Regalo",
   "format.date": "D MMM YYYY",
   "Transaction changed. Reload it and try again.": "La transazione è stata modificata. Ricaricala e riprova.",
-  "Request body must contain valid JSON.": "Il corpo della richiesta deve contenere JSON valido."
+  "Request body must contain valid JSON.": "Il corpo della richiesta deve contenere JSON valido.",
+  "Type digits; the last two are cents.": "Digita le cifre: le ultime due sono centesimi."
 }
