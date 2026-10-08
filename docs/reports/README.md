@@ -1,6 +1,6 @@
 # Final delivery reports
 
-Reviewed on **2026-10-08**, against application snapshot **72817a2**. Each report has 15 sections and an equivalent 15-page PDF in the local delivery package.
+Reviewed on **2026-10-08**, against application snapshot **3b54644**. Each report has 15 sections and an equivalent 15-page PDF in the local delivery package.
 
 - [Український звіт і підготовка до співбесіди](FINAL_REPORT_UK.md)
 - [English implementation and interview report](FINAL_REPORT_EN.md)
@@ -11,7 +11,7 @@ The reports cover the same implementation and evidence. They distinguish require
 
 1. Прочитай розділи **1–2**: що було в шаблоні, що вимагав PDF і що додано пізніше.
 2. Розбери **3–7**: шлях запиту, цілі центи, календарна дата, owner isolation, cookies, refresh і категорії. Повтори приклади своїми словами.
-3. Вивчи **9–10**: конкретні помилки, виправлення та межі перевірок. Важливо розрізняти 69 API-тестів, 7 тестів сесії та ручні browser checks.
+3. Вивчи **9–10**: конкретні помилки, виправлення та межі перевірок. Важливо розрізняти 69 API-тестів, 19 frontend-тестів (7 session + 8 amount-input + 4 shortcut) та ручні browser checks.
 4. Проговори відповіді **13–14** вголос. Підготуйся відкрити відповідні файли з карти коду в **15**.
 5. Виконай короткий сценарій **15** на власних тестових даних. Межі MVP пояснюй за **12**.
 
@@ -30,7 +30,7 @@ The reports cover the same implementation and evidence. They distinguish require
 
 ## Delivery status
 
-- Verified: 69 API tests, 7 session tests, active-code lint/format checks, production build, clean source installation and isolated API startup.
+- Verified: 69 API tests, 19 frontend tests, active-code lint/format checks, production build, clean source installation and isolated API startup.
 - Docker Compose configuration validates, but Docker Engine does not start on the development machine. Local MongoDB was used; Docker-backed execution is not claimed as verified.
 - Source export contains only the explicit allowlist. It excludes the original Git history, local evidence, `.env` files, databases, dependencies and inactive modules.
 - GitHub publication, Loom recording/upload and submission remain external steps. No external delivery was performed.
@@ -38,8 +38,4 @@ The reports cover the same implementation and evidence. They distinguish require
 
 See [verification](../VERIFICATION.md), [security notes](../SECURITY.md), [Loom script](../LOOM.md), and the root [startup instructions](../../README.md).
 
-Post-report demonstration preparation: [28 fictional transactions and 14 recording cases](../DEMO_CASES.md). Run `npm run seed:demo` to populate a fresh demo database without overwriting existing records or edits.
-
-Post-report amount-input update: digits now accumulate from cents (`1564` → `$15.64`). The frontend has 15 tests: 7 session + 8 amount-input tests. The original reports describe the earlier decimal editor; use the current README and recording cases for input instructions. No API or database money representation changed.
-
-Post-report shortcuts update: `-` / `_` opens Expense, `+` / `=` opens Income; Amount autofocuses and displays the direction sign. Four shortcut tests bring the current frontend total to 19. See the current recording cases for the keyboard route.
+The reports include the final cents-first editor, keyboard shortcuts, autofocus, Add transaction placement and demo preparation. [DEMO_CASES.md](../DEMO_CASES.md) contains 14 manual recording cases. `npm run seed:demo` inserts 28 fictional transactions without overwriting existing edits. The final API review and earlier cold-export run are distinguished from later frontend checks; no browser E2E or Docker-backed run is claimed.

@@ -11,7 +11,7 @@
 - `git diff --check`: passed.
 - Original evidence SHA-256 still matches the recorded original.
 - Local env files and evidence are ignored; env files have been removed from the Git index.
-- The final-review 77-file clean application export passed `npm run setup`, `npm run build` and the complete `npm test` command independently. Its actual `Api/index.js` started on temporary port 4001 with a separate temporary MongoDB; `/` returned 200 and unauthenticated `/transactions` returned 401. Both temporary processes were stopped; the development database was never used. All 70 app/config/source files matched the working checkout byte-for-byte. Final report sources and diagrams are added to the delivery allowlist separately.
+- At snapshot 72817a2, the earlier 77-file clean application export passed `npm run setup`, `npm run build` and the complete `npm test` command independently. Its actual `Api/index.js` started on temporary port 4001 with a separate temporary MongoDB; `/` returned 200 and unauthenticated `/transactions` returned 401. Both temporary processes were stopped; the development database was never used. All 70 app/config/source files matched the working checkout byte-for-byte. The current delivery has 92 allowlisted source files; later editor/demo additions were checked separately as recorded below. This earlier cold run is not claimed as a fresh run of every final file.
 - Verified export: `.local/submission/2026-10-08T11-27-00-281Z-f0a008`. Application-source signature: `a6b97f9bdbf8b8f3b5f2a61f553a2f59836476c3dbfda81456f9702b6c70919d` (sorted relative path, NUL, bytes, NUL; excludes READMEs, docs and export script).
 - The English/Italian diary dictionaries contain matching sets of **137 keys**, with no empty Italian values.
 
@@ -88,3 +88,7 @@ Final recheck: Docker CLI 29.8.2 is installed at the per-user Docker Desktop pat
 ## Before submission
 
 Finish Docker setup and rerun `npm run db`, then seed and check the app using that database. Use `npm run export:clean` to create a fresh source-only snapshot and follow the README in it. Record Loom, create a new Git history and publish/submit only after the user's final authorization.
+
+## Final documentation reconciliation
+
+Both reports and PDFs now describe application snapshot `3b54644`: cents-first entry, guarded shortcuts, autofocus, list-header actions and fictional demo fixtures. Current totals are 69 API tests and 19 frontend tests (7 session + 8 amount-input + 4 shortcut). Documentation-only closeout does not change the verified application code. The final source-only ZIP is rebuilt with a per-file SHA-256 manifest; generated PDFs remain outside Git.

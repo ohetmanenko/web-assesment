@@ -47,7 +47,7 @@ Sign out and sign back in. Expected: same saved records.
 Show `npm test` and the three suites: auth, transactions and categories.
 Explain the 69 API tests: real MongoDB CRUD, invalid sums/dates, missing records, token/password failures, type/category validation, Title Case normalization, user isolation, stable ordering and concurrent classification conflicts. Briefly show the seven frontend session tests, including refresh/logout races and business failures after successful refresh.
 
-Eight additional frontend tests cover cents-first amount input, backspace, pasted decimals, invalid characters and amount boundaries; the frontend runner now executes 15 tests.
+Eight additional frontend tests cover cents-first amount input, backspace, pasted decimals, invalid characters and amount boundaries; four shortcut tests cover key mappings and input guards. The frontend runner executes 19 tests in total (7 session + 8 amount-input + 4 shortcut).
 
 Show the active route/controller/model/validation files. Explain:
 

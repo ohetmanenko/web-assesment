@@ -4,7 +4,7 @@ Technical assessment · evidence, architecture, decisions and final review
 
 > A working, authenticated income and expense diary with a documented delivery boundary.
 
-**2026-10-08 · Code snapshot: 72817a2**
+**2026-10-08 · Code snapshot: 3b54644**
 
 ## 1. Delivery overview
 
@@ -17,7 +17,7 @@ Daily Ledger implements persistent, user-owned income and expense transactions. 
 | Core product | Create, list, read, edit and delete; amount, category, calendar date and description. |
 | User experience | Desktop table, mobile cards, shared form, feedback states, demo autofill, totals, search and sorting. |
 | Data and access | Integer cents, calendar validation, server-side ownership, real bcrypt/JWT authentication, reusable categories. |
-| Final verification | 69 API tests + 7 session tests; lint, formatting and production build pass. |
+| Final verification | 69 API tests + 19 frontend tests; lint, formatting and production build pass. |
 | Languages | English and Italian in the app; this English report and a separate Ukrainian preparation guide. |
 
 > **Delivery boundary**
@@ -70,7 +70,7 @@ A create request follows: form validation -> decimal-to-cents conversion -> POST
 
 app.js exports the Express app for tests. index.js handles process startup and awaits the database before opening port 4000. The frontend runs on 3000. MongoDB runs on localhost:27017 in Docker or the documented local fallback.
 
-Main references: FrontEnd/src/routes/Home.jsx; components/TransactionForm.jsx; helpers/core/session.mjs; Api/app.js; controllers/transactions.js; db/connect.js.
+Main references: FrontEnd/src/routes/Home.jsx; components/TransactionForm.jsx; components/CentsInput.jsx; helpers/core/session.mjs; Api/app.js; controllers/transactions.js; db/connect.js.
 
 ## 4. Data model and invariants
 
@@ -88,7 +88,7 @@ Business dates and money have explicit representations.
 
 ### Case: money that remains exact
 
-Input 12,34 is normalized to 12.34. The decimal string is split into whole units and fractional digits, producing 1234 cents. The API and schema reject fractional cents, zero, negatives and values beyond the bound. Input 12.345 fails validation; it is not silently rounded. Letters are rejected during typing or insertion.
+Digits accumulate from cents: 1 -> 0.01, 15 -> 0.15, 156 -> 1.56, 1564 -> 15.64. Backspace removes a digit. Explicit decimal paste 15.64 or 15,64 is supported; pasted 12.345 is rejected without replacing the prior value. Typed digits 12345 mean 123.45. Letters and overflow are rejected. Canonical decimal text becomes integer cents; the API independently rejects zero, negatives and fractional cents.
 
 ### Case: a calendar day that does not shift
 
@@ -185,9 +185,10 @@ Feedback states and predictable actions support the CRUD workflow.
 | Save and errors | Controls disable during saving; synchronous ref guards reject duplicate submits before React re-renders. Failure preserves entered data. |
 | Desktop / mobile | Table at desktop widths; below 768 px cards show type and amount, then category/date, with wrapped descriptions. |
 | Actions | Vertical three-dot menu contains Edit/Delete; deletion requires confirmation. |
+| Fast entry | Add transaction sits after Refresh. - / _ opens Expense; + / = opens Income outside editable fields. Amount autofocuses after loading and shows a direction sign; stored cents stay positive. |
 | Search and sort | Type filter, category/description search, date/amount ordering and eight-record pagination. Shared state survives layout changes. |
 | Totals | Income, expenses and balance use all loaded records, independently of current search/type filters. |
-| Language | English/Italian controls on login and diary; browser-local preference; 135 matching diary keys per language. |
+| Language | English/Italian controls on login and diary; browser-local preference; 137 matching diary keys per language. |
 
 The rebuilt active UI reintegrates the original i18next architecture. The old common/core dictionaries remain available; diary contains the active screen strings. The choice drives HTML lang, Ant Design controls, dayjs dates and Intl USD presentation. Standard category labels translate; API values and user-written text remain stable.
 
@@ -221,11 +222,11 @@ Evidence is scoped to the code actually exercised.
 | Check | Final result |
 | --- | --- |
 | API integration | 69 tests / 3 suites passed with Jest, Supertest and real isolated MongoDB. |
-| Frontend session | 7 tests passed using actual Axios interceptors and a controlled adapter. |
+| Frontend | 19 tests: 7 actual-Axios session cases, 8 amount-input cases and 4 shortcut cases, using the native Node runner. |
 | API coverage | 94.84% statements; 89.28% branches; 100% functions; 95.41% lines. |
 | Static / build | Active API and frontend lint/format pass; production Vite build passes. |
 | Dependency audit | Frontend 0; API runtime 0; API full tree 19 moderate, 0 high/critical. |
-| Docker / clean export | Compose syntax valid; Engine unavailable. Fresh export install, build, 76 tests and isolated API startup passed. |
+| Docker / clean export | Compose syntax valid; Engine unavailable. Earlier export passed cold installation, build, 76 tests and isolated API startup; later frontend checks cover the final editor. |
 
 Coverage is limited by Api/jest.config.js to selected active controllers, middleware, helpers and the category route. It excludes model definitions, process startup, dormant modules and the UI. These are not whole-repository or browser-E2E percentages.
 
@@ -233,7 +234,7 @@ Coverage is limited by Api/jest.config.js to selected active controllers, middle
 | --- | --- |
 | Wrong password / missing token | 401; tests exercise bcrypt, real signatures, expiry and user existence. |
 | Another user's record ID | 404 for read/edit/delete; stored record is unchanged. |
-| 12.345 / negative / fractional cents | 400 or form error; no successful invalid write. |
+| Zero / negative / fractional cents | Form error or API 400; pasted excess precision is rejected before replacing the input. |
 | Leap date vs impossible date | 2024-02-29 accepted; impossible dates rejected by shared server rules. |
 | Type/category mismatch | 400; compatible pair must be selected deliberately. |
 | Concurrent reclassification | 409; deterministic test interleaves a real MongoDB update after the controller read. |
@@ -251,7 +252,7 @@ Reproducible commands and a source-only delivery path are included.
 From the repository root:
 npm run setup
 npm run db
-npm run seed
+npm run seed:demo
 
 Terminal 1: npm run api
 Terminal 2: npm run web
@@ -262,6 +263,8 @@ Demo: test@meblabs.com / testtest
 Requirements: Node 20.19+ in the 20.x line or 22.12+; tested locally with 22.23.2. Setup uses lockfiles and disables package lifecycle scripts. It creates missing env files with two distinct random JWT secrets and preserves existing ones. The Node seed creates the demo user only when absent.
 
 Compose defines MongoDB 8.0 with a localhost-only port, healthcheck and persistent volume. Docker Desktop still reports that it cannot start. The fallback npm run db:local runs a real MongoDB 8.2.6 with persisted data under .local/mongodb-data. It is separate from the Docker volume; data does not migrate automatically. Never run both on port 27017.
+
+npm run seed:demo inserts 28 fictional records: 5 incomes and 23 expenses. Fixture-only totals are USD7,136.17 income, USD2,462.25 expense and USD4,673.92 balance. Stable user-scoped IDs and insert-only writes preserve existing edits and unrelated data. Dates anchor at first insertion; timestamps are synthetic demo metadata. A deleted fixture is restored on rerun. docs/DEMO_CASES.md supplies 14 manual recording cases, not automated tests.
 
 ### Unexpected startup code in the supplied template
 
@@ -308,7 +311,7 @@ The project split, stack, Ant Design controls and auth/routing/i18next concepts.
 
 ### 2. Why integer cents rather than decimals?
 
-The API accepts a bounded safe integer and the client converts decimal text by splitting digits. This avoids storing fractional binary floating-point money. Demonstrate 12.34 -> 1234 and rejection of 12.345. Totals add cents and format only for display.
+The API accepts bounded integer cents. Typing 1234 displays 12.34 and sends 1234 cents. Decimal paste is parsed by digits; excess pasted precision is rejected. Totals add integer cents and format only for display, avoiding fractional binary floating-point storage.
 
 ### 3. Why store date as a string?
 
@@ -364,7 +367,7 @@ Move filtering and sorting into bounded API queries, use cursor pagination with 
 
 ### 15. Are all tests real integration tests?
 
-The 69 API tests use a real isolated mongod and HTTP requests through Supertest. The seven frontend tests use actual Axios interceptors with a controlled adapter. Neither is a browser E2E suite; coverage percentages are explicitly scoped.
+69 API tests use an isolated real mongod and HTTP through Supertest. Of 19 frontend tests, seven exercise actual Axios interceptors; eight cover amount helpers and four shortcut guards. Browser flows were checked manually, not by an automated E2E suite. Coverage is explicitly scoped.
 
 ### 16. What should the interviewer know remains incomplete?
 
@@ -378,7 +381,7 @@ A practical route for a 3-5 minute walkthrough and deeper code questions.
 | --- | --- |
 | 0:00-0:30 | Explain the scaffold and chosen persistence. Use demo autofill, sign in and show language selection. |
 | 0:30-1:30 | Create an invented USD12.34 expense and an income. Show table/cards, totals and search. |
-| 1:30-2:20 | Edit the same item, show invalid precision and type/category clearing; cancel/delete only disposable demo data. |
+| 1:30-2:20 | Edit the same item, show zero-amount validation and type/category clearing; cancel/delete only disposable demo data. |
 | 2:20-2:50 | Reload to demonstrate persistence; show mobile cards, action menu, date sorting and time-only tooltip. |
 | 2:50-3:40 | Run tests; explain ownership, cents, calendar dates and one final-review race correction. |
 | 3:40-4:30 | State limits, Docker/fallback distinction and next steps. Close with the working diary. |
@@ -387,11 +390,11 @@ A practical route for a 3-5 minute walkthrough and deeper code questions.
 | --- | --- |
 | Request / ownership / error handling | Api/routes/transactions.js; middlewares/isAuth.js; middlewares/validateTransaction.js; controllers/transactions.js |
 | Data / categories / authentication | Api/models/; helpers/categories.js; helpers/auth.js; controllers/auth.js |
-| UI and session coordination | FrontEnd/src/routes/Home.jsx; components/TransactionForm.jsx; helpers/core/session.mjs |
-| Tests and reproducibility | Api/specs/; FrontEnd/specs/auth-session.test.mjs; package-lock.json files; scripts/setup-env.cjs |
+| UI and session coordination | FrontEnd/src/routes/Home.jsx; components/TransactionForm.jsx; components/CentsInput.jsx; helpers/core/session.mjs |
+| Tests and reproducibility | Api/specs/; FrontEnd/specs/*.test.mjs; package-lock.json files; scripts/setup-env.cjs |
 | Delivery and supporting notes | README.md; docs/VERIFICATION.md; docs/SECURITY.md; docs/LOOM.md; scripts/export-clean.cjs |
 
-Local milestones: 024f54f (secure CRUD MVP), 04efd25 (categories/forms), 4630257 (mobile/actions/sorting), 84d250d (localization), 72817a2 (final review). These are cumulative milestones, not independent feature branches or an effort log.
+Local milestones: 024f54f (secure CRUD MVP), 04efd25 (categories/forms), 4630257 (mobile/actions/sorting), 84d250d (localization), 72817a2 (final review), 0e9cea1 (demo fixtures), e7c62c5 (cents-first input), 3b54644 (shortcuts/autofocus). These are cumulative milestones, not independent feature branches or an effort log.
 
 Source assessment: Technical_Assessment_Somnia(Web).pdf. Reference documentation: [E1] https://developer.mozilla.org/en-US/docs/Glossary/Safe/HTTP; [E2] https://mongoosejs.com/docs/8.x/docs/tutorials/findoneandupdate.html; [E3] https://react.dev/reference/react/useEffect. These support design rationale; local source and tests support implementation claims.
 
