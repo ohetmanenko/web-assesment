@@ -1,6 +1,27 @@
 const mongoose = require('mongoose');
 const Transaction = require('../models/transaction');
 const { apiError } = require('../middlewares/errors');
+const {
+  normalizeCategory,
+  isDefaultCategory,
+  isDefaultForType,
+  categoryAvailable,
+  rememberCategory
+} = require('../helpers/categories');
+
+const categoryData = async (body, user, previous) => {
+  const { customCategoryName, ...data } = body;
+  const type = data.type || previous?.type;
+  const category = normalizeCategory(customCategoryName || data.category || previous?.category);
+  if (category.length > 64) throw apiError(400, 'Category must contain at most 64 characters.', 400, 'category');
+  if (isDefaultCategory(category) && !isDefaultForType(category, type))
+    throw apiError(400, 'Choose a category for the selected transaction type.', 400, 'category');
+  if (previous && type !== previous.type && category === normalizeCategory(previous.category) && !customCategoryName) {
+    if (!(await categoryAvailable(user, type, category)))
+      throw apiError(400, 'Choose a category again when changing transaction type.', 400, 'category');
+  }
+  return { ...data, type, category };
+};
 exports.validateId = (req, res, next) => {
   if (!mongoose.isObjectIdOrHexString(req.params.id)) return next(apiError(400, 'Invalid transaction ID.'));
   return next();
@@ -24,7 +45,9 @@ exports.read = async (req, res, next) => {
 };
 exports.create = async (req, res, next) => {
   try {
-    const record = await Transaction.create({ ...req.body, user: req.user.id });
+    const data = await categoryData(req.body, req.user.id);
+    await rememberCategory(req.user.id, data.type, data.category);
+    const record = await Transaction.create({ ...data, user: req.user.id });
     return res.status(201).json(record.response());
   } catch (error) {
     return next(error);
@@ -32,9 +55,13 @@ exports.create = async (req, res, next) => {
 };
 exports.update = async (req, res, next) => {
   try {
+    const previous = await Transaction.findOne({ _id: req.params.id, user: req.user.id });
+    if (!previous) return next(apiError(404, 'Transaction not found.'));
+    const data = await categoryData(req.body, req.user.id, previous);
+    await rememberCategory(req.user.id, data.type, data.category);
     const record = await Transaction.findOneAndUpdate(
       { _id: req.params.id, user: req.user.id },
-      { $set: req.body },
+      { $set: data },
       { new: true, runValidators: true }
     );
     if (!record) return next(apiError(404, 'Transaction not found.'));

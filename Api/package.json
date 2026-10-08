@@ -10,8 +10,8 @@
     "seed": "node db/seed.js",
     "test": "jest --runInBand",
     "test:coverage": "jest --coverage --runInBand",
-    "lint": "eslint app.js index.js controllers/auth.js controllers/transactions.js db/connect.js db/seed.js helpers/auth.js helpers/transactions.js models/user.js models/rt.js models/transaction.js middlewares/errors.js middlewares/isAuth.js middlewares/validateTransaction.js routes/auth.js routes/transactions.js specs/env.js specs/database.js specs/auth.test.js specs/transactions.test.js jest.config.js db/dev-mongo.js",
-    "format:check": "prettier --check app.js index.js controllers/auth.js controllers/transactions.js db/connect.js db/seed.js helpers/auth.js helpers/transactions.js models/user.js models/rt.js models/transaction.js middlewares/errors.js middlewares/isAuth.js middlewares/validateTransaction.js routes/auth.js routes/transactions.js specs/env.js specs/database.js specs/auth.test.js specs/transactions.test.js jest.config.js db/dev-mongo.js",
+    "lint": "eslint app.js index.js controllers/auth.js controllers/transactions.js db/connect.js db/seed.js helpers/auth.js helpers/transactions.js models/user.js models/rt.js models/transaction.js middlewares/errors.js middlewares/isAuth.js middlewares/validateTransaction.js routes/auth.js routes/transactions.js specs/env.js specs/database.js specs/auth.test.js specs/transactions.test.js jest.config.js db/dev-mongo.js helpers/categories.js models/category.js routes/categories.js specs/categories.test.js",
+    "format:check": "prettier --check app.js index.js controllers/auth.js controllers/transactions.js db/connect.js db/seed.js helpers/auth.js helpers/transactions.js models/user.js models/rt.js models/transaction.js middlewares/errors.js middlewares/isAuth.js middlewares/validateTransaction.js routes/auth.js routes/transactions.js specs/env.js specs/database.js specs/auth.test.js specs/transactions.test.js jest.config.js db/dev-mongo.js helpers/categories.js models/category.js routes/categories.js specs/categories.test.js",
     "db:local": "node db/dev-mongo.js"
   },
   "dependencies": {

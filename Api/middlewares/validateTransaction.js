@@ -1,6 +1,6 @@
 const { apiError } = require('./errors');
 const { isCalendarDate, MAX_AMOUNT_CENTS } = require('../helpers/transactions');
-const fields = ['type', 'amountCents', 'category', 'date', 'description'];
+const fields = ['type', 'amountCents', 'category', 'date', 'description', 'customCategoryName'];
 module.exports =
   (partial = false) =>
   (req, res, next) => {
@@ -29,6 +29,15 @@ module.exports =
       if (typeof body.category !== 'string' || !body.category.trim() || body.category.trim().length > 64)
         return next(apiError(400, 'Category is required and must contain at most 64 characters.', 400, 'category'));
       body.category = body.category.trim();
+    }
+    if (keys.includes('customCategoryName')) {
+      if (typeof body.customCategoryName !== 'string' || body.customCategoryName.trim().length > 64)
+        return next(
+          apiError(400, 'A custom category name must contain at most 64 characters.', 400, 'customCategoryName')
+        );
+      if (typeof body.category !== 'string' || body.category.toLowerCase() !== 'other')
+        return next(apiError(400, 'A custom category name can only be used with Other.', 400, 'customCategoryName'));
+      body.customCategoryName = body.customCategoryName.trim();
     }
     if (keys.includes('description')) {
       if (typeof body.description !== 'string' || body.description.trim().length > 500)

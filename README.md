@@ -2,7 +2,7 @@
 
 An authenticated expense and income diary built with React 18, Ant Design 5, Express and MongoDB/Mongoose.
 
-Users can create, read, edit and delete their own transactions. The English UI includes a responsive table, a shared create/edit form, deletion confirmation, loading/empty/error states, category search, type filters and income/expense/balance totals.
+Users can create, read, edit and delete their own transactions. The English UI includes a responsive table, a shared create/edit form with loading skeletons and type-specific colors/icons, deletion confirmation, category search, type filters and income/expense/balance totals. The category selector separates suggested categories from the user's saved custom categories.
 
 ## Run locally
 
@@ -72,7 +72,7 @@ npm run format:check
 npm run build
 ```
 
-Jest + Supertest run **46 integration tests** against isolated MongoDB processes; they never use the development database or Docker. Test coverage includes actual password hashing/login, invalid and expired tokens, refresh/logout, complete CRUD, exact cents, leap dates, invalid values, malformed/missing IDs and cross-user isolation. First test execution downloads a MongoDB binary; later runs reuse its cache.
+Jest + Supertest run **66 integration tests** against isolated MongoDB processes; they never use the development database or Docker. Test coverage includes actual password hashing/login, invalid and expired tokens, refresh/logout, complete CRUD, exact cents, leap dates, invalid values, malformed/missing IDs, category normalization, category/type consistency and cross-user isolation. First test execution downloads a MongoDB binary; later runs reuse its cache.
 
 Production output is `FrontEnd/dist`. The Vite build reports a large chunk warning; bundle splitting is a possible follow-up for this small MVP.
 
@@ -91,6 +91,7 @@ Authentication uses HttpOnly, SameSite=Lax cookies. Responses never expose passw
 | GET    | `/auth/rt`          | Refresh access cookie using a valid persisted session   |
 | GET    | `/auth/logout`      | Revoke refresh session and clear cookies                |
 | GET    | `/transactions`     | Current user's transactions, newest calendar date first |
+| GET    | `/categories`       | Suggested and custom categories grouped by type         |
 | POST   | `/transactions`     | Create a transaction (201)                              |
 | GET    | `/transactions/:id` | Read one owned transaction                              |
 | PATCH  | `/transactions/:id` | Update allowed fields, leaving omitted fields unchanged |
@@ -112,7 +113,9 @@ Example create body:
 
 - Money: positive safe integers, **1–999,999,999 cents** ($0.01–$9,999,999.99); USD only. The frontend converts decimal strings to cents without floating-point multiplication.
 - Date: a real calendar date in exact `YYYY-MM-DD` format, year 1900–9999. It is stored as a string rather than a timestamp to avoid timezone shifts.
-- Category: trimmed, 1–64 characters; presets and custom values are supported.
+- Category: trimmed, 1–64 characters; presets must match the transaction type. Custom names are normalized to Title Case, with repeated spaces collapsed. Custom categories are stored per user and type in a separate collection with a unique index, and remain available after deleting transactions.
+- Choosing **Other** reveals an optional name field. Send `"category": "Other", "customCategoryName": "pet care"` to save the transaction as **Pet Care** and register that name for reuse. An omitted or blank name saves **Other**. `customCategoryName` is accepted only alongside **Other** and is not included in the stored transaction or its response. Entering a same-type preset name reuses that preset.
+- Changing transaction type clears an incompatible selected category and any unfinished custom name in the form. **Other** is shared; a custom name can be retained if it is already registered for both types. The API rejects type changes that silently retain incompatible categories. Legacy custom values remain available; editing an incompatible legacy preset prompts for a valid category.
 - Description: trimmed, at most 500 characters.
 - Owner comes exclusively from the verified session. Client-supplied owners, unknown properties and MongoDB operators are rejected.
 - Errors: 400 for invalid input; 401 for missing/invalid authentication; 404 for missing or foreign records. Shape: `{ "error": 400, "message": "...", "data": { "field": "..." } }` (field is optional).
@@ -121,7 +124,7 @@ Created records include `_id`, all transaction fields, `createdAt` and `updatedA
 
 ## Implementation choices and MVP limits
 
-The app mounts only explicit auth and transaction routes. Mongoose provides persistence, model constraints and an owner/date index; request validation returns useful errors before database access. UI changes follow successful API responses and surface failures.
+The app mounts explicit auth, transaction and category routes. Mongoose provides persistence, model constraints and owner-scoped indexes; request validation returns useful errors before database access. UI changes follow successful API responses and surface failures. The form displays a skeleton while fetching categories, with a retry action on failure; saving keeps the entered fields visible and disables controls until the response arrives.
 
 Access tokens live for 15 minutes; refresh tokens live for 7 days and are stored as SHA-256 hashes with an expiry index. The frontend retries an authenticated request once after a shared refresh request. Logout revokes refresh and removes browser cookies; a copied access token remains valid until its 15-minute expiry. Secure cookies are enabled with `NODE_ENV=production`, which requires HTTPS.
 

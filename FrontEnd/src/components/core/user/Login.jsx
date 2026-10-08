@@ -1,14 +1,24 @@
 import { useState } from 'react';
-import { Alert, Button, Form, Input, Typography } from 'antd';
+import { Alert, Button, Form, Input, Tooltip, Typography } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBookOpen, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faBookOpen, faArrowRight, faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../../../helpers/core/AuthContext';
 import { getApiError } from '../../../helpers/core/Api';
 
+const DEMO_CREDENTIALS = { email: 'test@meblabs.com', password: 'testtest' };
+
 const Login = () => {
   const { signIn } = useAuth();
+  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const fillDemo = () => {
+    form.setFields([
+      { name: 'email', value: DEMO_CREDENTIALS.email, errors: [] },
+      { name: 'password', value: DEMO_CREDENTIALS.password, errors: [] }
+    ]);
+    setError('');
+  };
   const onFinish = async values => {
     setLoading(true);
     setError('');
@@ -56,10 +66,11 @@ const Login = () => {
           <p className="muted">Sign in to keep track of the day.</p>
           {error && <Alert type="error" showIcon message={error} className="login-error" />}
           <Form
+            form={form}
             layout="vertical"
             onFinish={onFinish}
             requiredMark={false}
-            initialValues={{ email: 'test@meblabs.com' }}
+            initialValues={{ email: DEMO_CREDENTIALS.email }}
           >
             <Form.Item
               label="Email address"
@@ -76,9 +87,22 @@ const Login = () => {
             </Button>
           </Form>
           <div className="demo-note">
-            <strong>Explore the demo</strong>
+            <div className="demo-note-heading">
+              <strong>Explore the demo</strong>
+              <Tooltip title="Fill demo credentials">
+                <Button
+                  className="demo-fill-button"
+                  type="text"
+                  htmlType="button"
+                  aria-label="Fill demo credentials"
+                  disabled={loading}
+                  onClick={fillDemo}
+                  icon={<FontAwesomeIcon icon={faWandMagicSparkles} />}
+                />
+              </Tooltip>
+            </div>
             <span>
-              test@meblabs.com <span aria-hidden="true">·</span> testtest
+              {DEMO_CREDENTIALS.email} <span aria-hidden="true">·</span> {DEMO_CREDENTIALS.password}
             </span>
           </div>
         </div>

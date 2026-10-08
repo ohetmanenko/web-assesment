@@ -39,8 +39,8 @@ Sign out and sign back in. Expected: same saved records.
 
 ## 2:50–3:40 — API tests and structure
 
-Show `npm test` and the two suites: auth and transactions.
-Explain the 46 tests: real MongoDB CRUD, invalid sums/dates, missing records, token/password failures and foreign-record isolation.
+Show `npm test` and the three suites: auth, transactions and categories.
+Explain the 66 tests: real MongoDB CRUD, invalid sums/dates, missing records, token/password failures, type/category validation, Title Case normalization and user isolation.
 
 Show the active route/controller/model/validation files. Explain:
 

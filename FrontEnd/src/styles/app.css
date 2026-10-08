@@ -355,6 +355,97 @@ a {
   height: 40px;
   line-height: 38px;
 }
+.type-option.expense {
+  --type-option-tone: #9d5b35;
+}
+.type-option.income {
+  --type-option-tone: #176b65;
+}
+.type-radio .type-option:not(.ant-radio-button-wrapper-checked):not(.ant-radio-button-wrapper-disabled):hover {
+  color: var(--type-option-tone);
+}
+.type-radio .type-option:has(:focus-visible) {
+  outline-color: var(--type-option-tone);
+}
+.transaction-modal.income {
+  --transaction-tone: #176b65;
+  --transaction-tint: #e9f4ef;
+}
+.transaction-modal.expense {
+  --transaction-tone: #9d5b35;
+  --transaction-tint: #fbf0e6;
+}
+.transaction-modal .ant-modal-content {
+  border-top: 4px solid var(--transaction-tone);
+}
+.transaction-direction {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  color: var(--transaction-tone);
+  background: var(--transaction-tint);
+  border-radius: 8px;
+  font-size: 13px;
+}
+.type-option-icon {
+  margin-right: 5px;
+}
+.type-option-icon.expense {
+  color: #9d5b35;
+}
+.type-option-icon.income {
+  color: #176b65;
+}
+.type-radio .ant-radio-button-wrapper-checked .type-option-icon {
+  color: inherit;
+}
+.category-heading {
+  display: flex;
+  min-height: 24px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.category-heading .ant-btn {
+  color: #66727c;
+}
+.category-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 20px;
+}
+.category-fields.with-other {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.category-fields .ant-form-item {
+  min-width: 0;
+}
+@media (max-width: 600px) {
+  .category-fields.with-other {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.form-skeleton {
+  padding-bottom: 20px;
+}
+.form-skeleton .ant-skeleton {
+  margin-bottom: 16px;
+}
+.form-skeleton .ant-skeleton-input {
+  width: 100%;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
 .optional-label {
   margin-left: 6px;
   font-size: 11px;
@@ -487,6 +578,18 @@ a {
 .demo-note strong {
   color: #637780;
   font-weight: 500;
+}
+.demo-note-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.login-card .demo-fill-button {
+  margin: 0;
+  height: 32px;
+  width: 32px;
+  color: #176b65;
 }
 .login-caption {
   position: absolute;

@@ -1,4 +1,11 @@
 export const MAX_AMOUNT_CENTS = 999999999;
+export const titleCaseCategory = value =>
+  value
+    .normalize('NFKC')
+    .trim()
+    .replace(/\s+/gu, ' ')
+    .toLowerCase()
+    .replace(/(^|[\s\-_])\p{L}/gu, match => match.toUpperCase());
 export const formatMoney = cents =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
 export const centsToInput = cents => Math.floor(cents / 100) + '.' + String(cents % 100).padStart(2, '0');

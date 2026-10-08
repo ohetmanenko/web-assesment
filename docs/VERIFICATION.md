@@ -2,15 +2,15 @@
 
 ## Automated checks
 
-- `npm test`: 2 suites, **46 tests passed**, using Jest 30.5.2, Supertest and isolated MongoDB.
+- `npm test`: 3 suites, **66 tests passed**, using Jest 30.5.2, Supertest and isolated MongoDB. Category tests cover Title Case, duplicate prevention, type changes, optional Other names, legacy values, persistence after deletion and user isolation.
 - `npm run lint`: API and frontend passed.
 - `npm run format:check`: active API/frontend files passed.
-- `npm run build`: passed with Vite 8.3.3; one bundle-size warning remains (about 391 KB gzipped).
+- `npm run build`: passed with Vite 8.3.3; one bundle-size warning remains (about 392 KB gzipped).
 - `docker compose config --quiet`: passed; configuration syntax is valid.
 - `git diff --check`: passed.
 - Original evidence SHA-256 still matches the recorded original.
 - Local env files and evidence are ignored; env files have been removed from the Git index.
-- A 61-file allowlisted clean export passed `npm run setup`, `npm run build` and `npm run seed`. Its API started on a temporary port 4001 and returned HTTP 200; that temporary process was stopped after verification. Existing demo records were preserved.
+- The earlier 61-file allowlisted clean export passed `npm run setup`, `npm run build` and `npm run seed`. Its API started on a temporary port 4001 and returned HTTP 200; that temporary process was stopped after verification. Existing demo records were preserved. A new 66-file source export was generated after the category additions, including the API/model/tests and form skeleton.
 
 ## Manual app checks
 
@@ -28,6 +28,13 @@ Using the local MongoDB fallback:
 10. Inspect desktop and 390 px mobile layouts, including the shared form and horizontal table scrolling.
 11. Stop the API briefly: the table shows a useful error and Try again action; restart and retry restores the list.
 12. Reload after dependency upgrades: routing, authentication and the diary render correctly.
+13. Demo auto-fill populates both login inputs, clears validation errors and leaves sign-in to the submit button.
+14. The transaction form displays a loading skeleton while requesting categories and enables submission once ready.
+15. Selecting Transport then Income clears the incompatible category, shows an explanation and changes the form's color/icons.
+16. Custom categories appear in a separate Your categories group. Selecting Other reveals the optional name with a Title Case preview; Clear removes the selection and custom-name field.
+17. Editing an older income record with Food & drinks clears its incompatible category and prompts for a replacement. Cancelling preserves the saved record.
+18. The extended form stacks amount/date at 390 px width and keeps its footer buttons reachable by scrolling or keyboard focus.
+19. At 1024 px, Category and the optional Other name share one row; at 390 px, they stack without overflowing the form. Typing `pEt` suggests the user's existing `Pet Care` expense category, and selecting it shows the same Title Case name. Switching to Income clears the draft and excludes that expense-only suggestion.
 
 Local browser screenshots are under ignored `.local/screenshots`. Real user records are not exported. Screenshots from the QA cycle are local verification evidence, not submission assets.
 
