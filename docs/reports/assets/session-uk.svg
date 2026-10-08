@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="499.27" height="220" preserveAspectRatio="xMinYMin meet" viewBox="0 0 499 220" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="499.27" height="220"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-220)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="0" y="125" width="235" height="87" rx="7" ry="7" style="stroke: rgb(84%,89%,88%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(92%,96%,95%); fill-rule: evenodd;"/>
+			<rect x="0" y="207" width="235" height="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+			<text x="12" y="187" style="font-family: Arial-Bold; font-size: 10.2px;fill: rgb(12%,20%,23%); stroke:none;" transform="translate(0,374) scale(1,-1)">01  ВХІД</text>
+			<text x="12" y="169" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,338) scale(1,-1)">Пароль -&gt; bcrypt</text>
+			<text x="12" y="156" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,312) scale(1,-1)">POST /auth/login</text>
+			<rect x="264" y="125" width="235" height="87" rx="7" ry="7" style="stroke: rgb(84%,89%,88%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(92%,96%,95%); fill-rule: evenodd;"/>
+			<rect x="264" y="207" width="235" height="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+			<text x="276" y="187" style="font-family: Arial-Bold; font-size: 10.2px;fill: rgb(12%,20%,23%); stroke:none;" transform="translate(0,374) scale(1,-1)">02  СЕСІЯ</text>
+			<text x="276" y="169" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,338) scale(1,-1)">Access JWT: 15 хв</text>
+			<text x="276" y="156" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,312) scale(1,-1)">Refresh JWT: 7 днів</text>
+			<rect x="0" y="10" width="235" height="87" rx="7" ry="7" style="stroke: rgb(84%,89%,88%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(92%,96%,95%); fill-rule: evenodd;"/>
+			<rect x="0" y="92" width="235" height="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+			<text x="12" y="72" style="font-family: Arial-Bold; font-size: 10.2px;fill: rgb(12%,20%,23%); stroke:none;" transform="translate(0,144) scale(1,-1)">03  ОНОВЛЕННЯ</text>
+			<text x="12" y="54" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,108) scale(1,-1)">401 -&gt; POST /auth/rt</text>
+			<text x="12" y="41" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,82) scale(1,-1)">Один повтор запиту</text>
+			<rect x="264" y="10" width="235" height="87" rx="7" ry="7" style="stroke: rgb(84%,89%,88%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(92%,96%,95%); fill-rule: evenodd;"/>
+			<rect x="264" y="92" width="235" height="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+			<text x="276" y="72" style="font-family: Arial-Bold; font-size: 10.2px;fill: rgb(12%,20%,23%); stroke:none;" transform="translate(0,144) scale(1,-1)">04  ВИХІД</text>
+			<text x="276" y="54" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,108) scale(1,-1)">POST /auth/logout</text>
+			<text x="276" y="41" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,82) scale(1,-1)">Відкликати refresh + cookies</text>
+			<path d="M 237,169 L 261,169 Z" style="stroke: rgb(9%,41%,39%); stroke-linecap: butt; stroke-width: 1.4;"/>
+			<polygon points="261 169, 255 165.5, 255 172.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+			<path d="M 381,125 L 381,111 Z" style="stroke: rgb(9%,41%,39%); stroke-linecap: butt; stroke-width: 1.2;"/>
+			<path d="M 381,111 L 117,111 Z" style="stroke: rgb(9%,41%,39%); stroke-linecap: butt; stroke-width: 1.2;"/>
+			<path d="M 117,111 L 117,99 Z" style="stroke: rgb(9%,41%,39%); stroke-linecap: butt; stroke-width: 1.4;"/>
+			<polygon points="117 99, 113.5 105, 120.5 105" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+			<path d="M 237,54 L 261,54 Z" style="stroke: rgb(9%,41%,39%); stroke-linecap: butt; stroke-width: 1.4;"/>
+			<polygon points="261 54, 255 50.5, 255 57.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+		</g>
+	</g>
+</svg>

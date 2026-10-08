@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="499.27" height="260" preserveAspectRatio="xMinYMin meet" viewBox="0 0 499 260" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="499.27" height="260"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-260)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="0" y="154" width="235" height="100" rx="7" ry="7" style="stroke: rgb(84%,89%,88%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(92%,96%,95%); fill-rule: evenodd;"/>
+			<rect x="0" y="249" width="235" height="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+			<text x="12" y="229" style="font-family: Arial-Bold; font-size: 10.2px;fill: rgb(12%,20%,23%); stroke:none;" transform="translate(0,458) scale(1,-1)">React + Ant Design</text>
+			<text x="12" y="211" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,422) scale(1,-1)">Login / Home / TransactionForm</text>
+			<text x="12" y="198" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,396) scale(1,-1)">Desktop table + mobile cards</text>
+			<text x="12" y="185" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,370) scale(1,-1)">i18next / Ant locale / dayjs / Intl</text>
+			<rect x="264" y="154" width="235" height="100" rx="7" ry="7" style="stroke: rgb(84%,89%,88%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(92%,96%,95%); fill-rule: evenodd;"/>
+			<rect x="264" y="249" width="235" height="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+			<text x="276" y="229" style="font-family: Arial-Bold; font-size: 10.2px;fill: rgb(12%,20%,23%); stroke:none;" transform="translate(0,458) scale(1,-1)">Axios + session coordinator</text>
+			<text x="276" y="211" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,422) scale(1,-1)">HttpOnly cookies / 15-second timeout</text>
+			<text x="276" y="198" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,396) scale(1,-1)">One shared refresh / one retry</text>
+			<text x="276" y="185" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,370) scale(1,-1)">Abort stale reads / protect local state</text>
+			<path d="M 236,204 L 263,204 Z" style="stroke: rgb(9%,41%,39%); stroke-linecap: butt; stroke-width: 1.4;"/>
+			<polygon points="263 204, 257 200.5, 257 207.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+			<rect x="0" y="10" width="235" height="112" rx="7" ry="7" style="stroke: rgb(84%,89%,88%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(92%,96%,95%); fill-rule: evenodd;"/>
+			<rect x="0" y="117" width="235" height="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(61%,35%,20%); fill-rule: evenodd;"/>
+			<text x="12" y="97" style="font-family: Arial-Bold; font-size: 10.2px;fill: rgb(12%,20%,23%); stroke:none;" transform="translate(0,194) scale(1,-1)">Express API</text>
+			<text x="12" y="79" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,158) scale(1,-1)">Routes -&gt; JWT -&gt; request validation</text>
+			<text x="12" y="66" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,132) scale(1,-1)">Controllers -&gt; owner-scoped queries</text>
+			<text x="12" y="53" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,106) scale(1,-1)">JSON errors / POST auth mutations</text>
+			<rect x="264" y="10" width="235" height="112" rx="7" ry="7" style="stroke: rgb(84%,89%,88%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(92%,96%,95%); fill-rule: evenodd;"/>
+			<rect x="264" y="117" width="235" height="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+			<text x="276" y="97" style="font-family: Arial-Bold; font-size: 10.2px;fill: rgb(12%,20%,23%); stroke:none;" transform="translate(0,194) scale(1,-1)">Mongoose + MongoDB</text>
+			<text x="276" y="79" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,158) scale(1,-1)">User / RefreshToken / Transaction</text>
+			<text x="276" y="66" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,132) scale(1,-1)">Category / schema invariants</text>
+			<text x="276" y="53" style="font-family: Arial; font-size: 8.3px;fill: rgb(33%,40%,44%); stroke:none;" transform="translate(0,106) scale(1,-1)">Persistence + indexes + isolated tests</text>
+			<path d="M 235,65 L 263,65 Z" style="stroke: rgb(9%,41%,39%); stroke-linecap: butt; stroke-width: 1.4;"/>
+			<polygon points="263 65, 257 61.5, 257 68.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+			<path d="M 380,154 L 380,139 Z" style="stroke: rgb(9%,41%,39%); stroke-linecap: butt; stroke-width: 1.2;"/>
+			<path d="M 380,139 L 117,139 Z" style="stroke: rgb(9%,41%,39%); stroke-linecap: butt; stroke-width: 1.2;"/>
+			<path d="M 117,139 L 117,123 Z" style="stroke: rgb(9%,41%,39%); stroke-linecap: butt; stroke-width: 1.4;"/>
+			<polygon points="117 123, 113.5 129, 120.5 129" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,41%,39%); fill-rule: evenodd;"/>
+			<text x="195" y="143" style="font-family: Arial; font-size: 8px;fill: rgb(9%,41%,39%); stroke:none;" transform="translate(0,286) scale(1,-1)">HTTP + cookies</text>
+		</g>
+	</g>
+</svg>

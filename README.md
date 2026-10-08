@@ -6,6 +6,10 @@ Users can create, read, edit and delete their own transactions. The UI uses a ta
 
 The language control on sign-in and in the diary switches between English (default) and Italian, using the template's i18next architecture. The choice persists in browser storage. Labels, validation, Ant Design controls, calendar dates and USD formatting follow the selected language. Preset category labels are translated; the API retains canonical category values and user-defined names are preserved.
 
+## Implementation and interview reports
+
+The [final report guide](docs/reports/README.md) links comprehensive [English](docs/reports/FINAL_REPORT_EN.md) and [Ukrainian](docs/reports/FINAL_REPORT_UK.md) reports, with architecture diagrams, implementation cases, final review fixes, verification limits and 16 interview questions. Equivalent PDFs accompany the local delivery package.
+
 ## Run locally
 
 Requirements: Node.js **20.19+ (20.x)** or **22.12+**, and npm; tested with **Node 22.23.2**. Docker Desktop must be running in Linux containers mode. On Windows, finish its WSL 2 setup and restart Windows if requested. `docker version` must show both Client and Server.

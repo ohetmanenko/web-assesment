@@ -78,6 +78,13 @@ const files = [
   'docs/LOOM.md',
   'docs/SECURITY.md',
   'docs/VERIFICATION.md',
+  'docs/reports/README.md',
+  'docs/reports/FINAL_REPORT_EN.md',
+  'docs/reports/FINAL_REPORT_UK.md',
+  'docs/reports/assets/architecture-en.svg',
+  'docs/reports/assets/architecture-uk.svg',
+  'docs/reports/assets/session-en.svg',
+  'docs/reports/assets/session-uk.svg',
   'package.json',
   'scripts/export-clean.cjs',
   'scripts/setup-env.cjs'
