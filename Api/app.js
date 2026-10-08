@@ -1,71 +1,17 @@
 const express = require('express');
-const path = require('path');
-const fs = require('fs');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const swaggerUI = require('swagger-ui-express');
-const { createServer } = require('http');
-
-const response = require('./middlewares/response');
-const passport = require('./middlewares/passport');
-const trimmer = require('./middlewares/trimmer');
-const limiter = require('./middlewares/limiter');
-const swagger = require('./middlewares/swagger');
-const { validator } = require('./middlewares/validator');
-
-const { SendData, NotFound } = require('./helpers/response');
-const swaggerSpec = require('./helpers/swagger');
-const checkCompany = require('./middlewares/checkCompany');
-const { isAuth } = require('./middlewares/isAuth');
-
+const authRoutes = require('./routes/auth');
+const transactionRoutes = require('./routes/transactions');
+const { apiError, errorHandler } = require('./middlewares/errors');
 const app = express();
-
-const server = createServer(app);
-
-app.use(
-  cors({
-    credentials: true,
-    origin: process.env.CORS_ORIGIN,
-    allowedHeaders: ['content-type'],
-    exposedHeaders: ['x-total-count', 'x-next-key']
-  })
-);
-
-if (process.env.LIMITER === '1') app.use(limiter());
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.disable('x-powered-by');
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://127.0.0.1:3000', credentials: true }));
+app.use(express.json({ limit: '16kb' }));
 app.use(cookieParser());
-app.use(trimmer());
-app.use(swagger());
-app.use(passport());
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
-app.use((req, res, next) => {
-  req.io = io;
-  return next();
-});
-
-app.get('/', (req, res, next) => next(SendData({ message: 'RestAPI is alive!' })));
-
-const excludedPaths = [];
-
-// dynamic routes for express
-fs.readdirSync(path.join(__dirname, '/routes'))
-  .filter(file => file.indexOf('.') !== 0 && file.slice(-3) === '.js')
-  .forEach(file => {
-    const f = path.parse(file).name;
-    if (f.startsWith('c_'))
-      app.use(
-        `/companies/:companyId/${f.slice(2)}`,
-        validator({ params: 'companyId' }),
-        (req, res, next) => isAuth(req, res, next, { excludedPaths }),
-        checkCompany({ excludedPaths }),
-        require(`./routes/${f}`)
-      );
-    else app.use(`/${f}`, require(`./routes/${f}`));
-  });
-
-app.all('*', (req, res, next) => next(NotFound()));
-
-app.use((toSend, req, res, next) => response(toSend, res));
-
-module.exports = server;
+app.get('/', (req, res) => res.json({ message: 'Expense Diary API is running' }));
+app.use('/auth', authRoutes);
+app.use('/transactions', transactionRoutes);
+app.use((req, res, next) => next(apiError(404, 'Route not found')));
+app.use(errorHandler);
+module.exports = app;

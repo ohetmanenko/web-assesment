@@ -1,59 +1,28 @@
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-
-const generateToken = async (res, user) => {
-  // Handle both real user objects and mock user objects
-  const userId = user._id || user.id;
-  const userEmail = user.email;
-  const userRole = user.role || 'user';
-  
-  const accessToken = jwt.sign(
-    {
-      id: userId,
-      email: userEmail,
-      role: userRole
-    },
-    process.env.JWT_SECRET || 'secret',
-    { expiresIn: '24h' }
-  );
-  
-  const refreshToken = jwt.sign(
-    {
-      id: userId,
-      email: userEmail,
-      role: userRole
-    },
-    process.env.JWT_SECRET || 'secret',
-    { expiresIn: '7d' }
-  );
-  
-  // Set cookies
-  res.cookie('accessToken', accessToken, {
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-    sameSite: 'lax'
-  });
-  
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    sameSite: 'lax'
-  });
-  
-  res.cookie('logged', true, {
-    maxAge: 24 * 60 * 60 * 1000,
-    sameSite: 'lax'
-  });
-  
-  return { accessToken, refreshToken };
+const RefreshToken = require('../models/rt');
+const hashToken = token => crypto.createHash('sha256').update(token).digest('hex');
+const cookieOptions = { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', path: '/' };
+const setAccessToken = (res, user) => {
+  const token = jwt.sign({ type: 'access' }, process.env.JWT_SECRET, { subject: user.id, expiresIn: '15m' });
+  res.cookie('accessToken', token, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
 };
-
-const clearTokens = (res) => {
-  res.clearCookie('accessToken');
-  res.clearCookie('refreshToken');
-  res.clearCookie('logged');
+const createSession = async (res, user) => {
+  const token = jwt.sign({ type: 'refresh' }, process.env.RT_SECRET, {
+    subject: user.id,
+    jwtid: crypto.randomUUID(),
+    expiresIn: '7d'
+  });
+  await RefreshToken.create({
+    user: user.id,
+    tokenHash: hashToken(token),
+    expiresAt: new Date(Date.now() + 7 * 86400000)
+  });
+  res.cookie('refreshToken', token, { ...cookieOptions, maxAge: 7 * 86400000 });
+  setAccessToken(res, user);
 };
-
-module.exports = {
-  generateToken,
-  clearTokens
+const clearTokens = res => {
+  res.clearCookie('accessToken', cookieOptions);
+  res.clearCookie('refreshToken', cookieOptions);
 };
+module.exports = { createSession, setAccessToken, clearTokens, hashToken };

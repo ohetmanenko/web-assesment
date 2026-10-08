@@ -1,16 +1,7 @@
 const mongoose = require('mongoose');
-
-const { Schema } = mongoose;
-
-const schema = Schema(
-  {
-    token: String,
-    expires: { type: Date, expires: 0 },
-    user: { type: Schema.Types.ObjectId, ref: 'User', index: true }
-  },
-  {
-    timestamps: true
-  }
-);
-
-module.exports = mongoose.models.Rt || mongoose.model('Rt', schema);
+const schema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  tokenHash: { type: String, required: true, unique: true },
+  expiresAt: { type: Date, required: true, expires: 0 }
+});
+module.exports = mongoose.models.RefreshToken || mongoose.model('RefreshToken', schema);

@@ -1,114 +1,79 @@
-/* eslint-disable no-param-reassign */
-import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Api from './Api';
 
-export const AuthStatus = {
-  Loading: 0,
-  SignedIn: 1,
-  SignedOut: -1
-};
-
-let refreshTokenPromise = false;
-
-const AuthContext = createContext({});
+export const AuthStatus = { Loading: 0, SignedIn: 1, SignedOut: -1 };
+const AuthContext = createContext(null);
+export default AuthContext;
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthContextProvider = ({ children }) => {
-  const { i18n } = useTranslation();
   const [authStatus, setAuthStatus] = useState(AuthStatus.Loading);
-  const [logged, setLogged] = useState({});
+  const [logged, setLogged] = useState(null);
+  const refreshRequest = useRef(null);
 
-  const signIn = useCallback(
-    (email, password, afterSignIn = () => {}) =>
-      Api.post('/auth/login', { email, password }).then(async res => {
-        setLogged(res.data);
-        setAuthStatus(AuthStatus.SignedIn);
-        return afterSignIn();
-      }),
-    []
-  );
-
-  const signOut = useCallback(async (afterSignOut = () => {}) => {
-    setAuthStatus(AuthStatus.SignedOut);
-    setLogged({});
+  const signIn = useCallback(async (email, password) => {
+    const { data } = await Api.post('/auth/login', { email, password });
+    setLogged(data);
+    setAuthStatus(AuthStatus.SignedIn);
+  }, []);
+  const signOut = useCallback(async () => {
     await Api.get('/auth/logout');
-    return afterSignOut();
+    setLogged(null);
+    setAuthStatus(AuthStatus.SignedOut);
   }, []);
 
-  const retryRT = (prevRequest, error) => {
-    try {
-      prevRequest.__isRetryRequest = true;
-
-      if (!refreshTokenPromise) {
-        refreshTokenPromise = Api.get('/auth/rt')
-          .then(async res => {
-            if (!res) {
-              refreshTokenPromise = false;
-              return Promise.reject(error);
-            }
-
-            refreshTokenPromise = false;
-            return res;
-          })
-          .catch(err => Promise.reject(error));
+  useEffect(() => {
+    let active = true;
+    const interceptor = Api.interceptors.response.use(
+      response => response,
+      async error => {
+        const request = error.config;
+        const skipRefresh = ['/auth/login', '/auth/rt', '/auth/logout'].includes(request?.url);
+        if (error.response?.status !== 401 || !request || request.retried || skipRefresh) throw error;
+        request.retried = true;
+        try {
+          if (!refreshRequest.current) {
+            refreshRequest.current = Api.get('/auth/rt')
+              .then(({ data }) => {
+                if (active) {
+                  setLogged(data);
+                  setAuthStatus(AuthStatus.SignedIn);
+                }
+              })
+              .finally(() => {
+                refreshRequest.current = null;
+              });
+          }
+          await refreshRequest.current;
+          return await Api(request);
+        } catch {
+          if (active) {
+            setLogged(null);
+            setAuthStatus(AuthStatus.SignedOut);
+          }
+          throw error;
+        }
       }
-
-      return refreshTokenPromise.then(() => Api(prevRequest));
-    } catch (err) {
-      return signOut();
-    }
-  };
-
-  const refreshTokenInterceptor = error => {
-    const prevRequest = error?.config;
-    const statusCode = error?.response?.status;
-    const customErrorCode = error?.response?.data?.error;
-
-    if (customErrorCode === 306 || customErrorCode === 307 || customErrorCode === 308) return signOut();
-
-    if (statusCode === 401 && !prevRequest?.__isRetryRequest) return retryRT(prevRequest, error);
-
-    return Promise.reject(error);
-  };
-
-  const resInterceptor = useMemo(() => Api.interceptors.response.use(res => res, refreshTokenInterceptor), []);
-
-  const checkUserStatus = () =>
+    );
     Api.get('/auth/check')
-      .then(res => {
-        if (res.data) {
-          setLogged(res.data);
+      .then(({ data }) => {
+        if (active) {
+          setLogged(data);
           setAuthStatus(AuthStatus.SignedIn);
         }
       })
       .catch(() => {
-        setAuthStatus(AuthStatus.SignedOut);
+        if (active) {
+          setLogged(null);
+          setAuthStatus(AuthStatus.SignedOut);
+        }
       });
+    return () => {
+      active = false;
+      Api.interceptors.response.eject(interceptor);
+    };
+  }, []);
 
-  useEffect(() => () => Api.interceptors.request.eject(resInterceptor), []);
-
-  useEffect(() => {
-    if (authStatus === AuthStatus.Loading) checkUserStatus();
-  }, [authStatus]);
-
-  useEffect(() => {
-    if (logged?.lang) i18n.changeLanguage(logged.lang.toLowerCase());
-  }, [logged]);
-
-  const exportedValue = useMemo(
-    () => ({
-      signOut,
-      signIn,
-      logged,
-      setLogged,
-      setAuthStatus,
-      authStatus
-    }),
-    [logged, authStatus]
-  );
-
-  return <AuthContext.Provider value={exportedValue}>{children}</AuthContext.Provider>;
+  const value = useMemo(() => ({ authStatus, logged, signIn, signOut }), [authStatus, logged, signIn, signOut]);
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-export default AuthContext;

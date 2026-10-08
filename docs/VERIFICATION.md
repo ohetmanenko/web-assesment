@@ -1,0 +1,54 @@
+# Verification — 2026-10-08
+
+## Automated checks
+
+- `npm test`: 2 suites, **46 tests passed**, using Jest 30.5.2, Supertest and isolated MongoDB.
+- `npm run lint`: API and frontend passed.
+- `npm run format:check`: active API/frontend files passed.
+- `npm run build`: passed with Vite 8.3.3; one bundle-size warning remains (about 391 KB gzipped).
+- `docker compose config --quiet`: passed; configuration syntax is valid.
+- `git diff --check`: passed.
+- Original evidence SHA-256 still matches the recorded original.
+- Local env files and evidence are ignored; env files have been removed from the Git index.
+- A 61-file allowlisted clean export passed `npm run setup`, `npm run build` and `npm run seed`. Its API started on a temporary port 4001 and returned HTTP 200; that temporary process was stopped after verification. Existing demo records were preserved.
+
+## Manual app checks
+
+Using the local MongoDB fallback:
+
+1. Seed twice: user created once; second run preserved existing data.
+2. Login and incorrect-password feedback.
+3. Create an expense; verify its exact $12.34 value.
+4. Reject $12.345 in the form before saving.
+5. Edit the same record to income, $2,500.01 and February 29, 2024.
+6. Reload, restart API and MongoDB, and verify the same record and date persist.
+7. Sign out and sign in again.
+8. Category/description search and unmatched-results empty state.
+9. Confirm deletion and remove only the QA record created during verification.
+10. Inspect desktop and 390 px mobile layouts, including the shared form and horizontal table scrolling.
+11. Stop the API briefly: the table shows a useful error and Try again action; restart and retry restores the list.
+12. Reload after dependency upgrades: routing, authentication and the diary render correctly.
+
+Local browser screenshots are under ignored `.local/screenshots`. Real user records are not exported. Screenshots from the QA cycle are local verification evidence, not submission assets.
+
+## Dependency audit
+
+- Frontend: **0** reported vulnerabilities, including dev dependencies.
+- API runtime: `npm audit --omit=dev` reports **0**.
+- API full tree: **19 moderate**, **0 high**, **0 critical** reports remain in the Jest/Babel coverage configuration chain, originating from `sprintf-js`. These are development/test dependencies, absent from runtime-only installs.
+- Compatible dependency fixes were applied; React Router, Vite and Jest were updated to patched major versions after checking their compatibility and rerunning checks.
+- The remaining automatic fix proposes downgrading Jest to version 25. It was not applied. Review upstream fixes or a tested replacement for the coverage configuration chain separately.
+
+An npm audit result is a dependency advisory check, not proof that all application security issues have been eliminated.
+
+Upgrade references: [Jest 30 guide](https://jestjs.io/docs/upgrading-to-jest30), [Vite migration](https://vite.dev/guide/migration), [React Router changelog](https://reactrouter.com/changelog).
+
+## Environment limitation
+
+Docker CLI and Compose are installed, but Engine reports “Docker Desktop is unable to start”; WSL is not installed. The attempted non-admin WSL command could not install it in this session. Complete WSL setup from an administrator terminal and restart Windows if prompted.
+
+Docker-backed startup and Docker-volume persistence **have not been verified on this machine**. The app, database connection ordering, seed and persistence were verified using the local MongoDB fallback. The fallback uses MongoDB 8.2.6; Compose specifies 8.0.
+
+## Before submission
+
+Finish Docker setup and rerun `npm run db`, then seed and check the app using that database. Use `npm run export:clean` to create a fresh source-only snapshot and follow the README in it. Record Loom, create a new Git history and publish/submit only after the user's final authorization.

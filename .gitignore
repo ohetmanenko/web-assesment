@@ -78,3 +78,12 @@ $RECYCLE.BIN/
 
 # Custom dir
 dbdata
+
+# Local evidence, secrets and IDE state
+.local/
+.idea/
+.env
+.env.test
+node_modules/
+coverage/
+dist/

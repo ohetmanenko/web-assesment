@@ -1,11 +1,8 @@
 module.exports = {
-  collectCoverageFrom: ['**/*/*.{js,jsx}', '!**/node_modules/**', '!**/coverage/**'],
-  coverageDirectory: 'coverage',
-  coveragePathIgnorePatterns: ['/node_modules/', 'package.json', 'package-lock.json'],
-  coverageProvider: 'v8',
-  globalSetup: '<rootDir>/test-dotenv.js',
-  testMatch: ['**/specs/**/*.[jt]s?(x)', '**/?(*.)+(test).[tj]s?(x)'],
-  moduleNameMapper: {
-    '#node-web-compat': './node-web-compat-node.js'
-  }
+  testEnvironment: 'node',
+  testMatch: ['**/specs/auth.test.js', '**/specs/transactions.test.js'],
+  setupFiles: ['<rootDir>/specs/env.js'],
+  testTimeout: 120000,
+  collectCoverageFrom: ['controllers/**/*.js', 'middlewares/**/*.js', 'helpers/auth.js', 'helpers/transactions.js'],
+  coverageDirectory: 'coverage'
 };

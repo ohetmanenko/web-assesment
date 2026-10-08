@@ -1,0 +1,23 @@
+{
+  "name": "daily-ledger",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Expense and income diary assessment",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "setup:env": "node scripts/setup-env.cjs",
+    "setup": "npm ci --prefix Api --ignore-scripts && npm ci --prefix FrontEnd --ignore-scripts && npm run setup:env",
+    "db": "docker compose up -d mongo --wait",
+    "seed": "npm run seed --prefix Api",
+    "api": "npm run dev --prefix Api",
+    "web": "npm start --prefix FrontEnd",
+    "test": "npm test --prefix Api",
+    "lint": "npm run lint --prefix Api && npm run lint --prefix FrontEnd",
+    "format:check": "npm run format:check --prefix Api && npm run format:check --prefix FrontEnd",
+    "build": "npm run build --prefix FrontEnd",
+    "db:local": "npm run db:local --prefix Api",
+    "export:clean": "node scripts/export-clean.cjs"
+  }
+}

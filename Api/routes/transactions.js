@@ -1,0 +1,10 @@
+const express = require('express');
+const controller = require('../controllers/transactions');
+const { isAuth } = require('../middlewares/isAuth');
+const validateTransaction = require('../middlewares/validateTransaction');
+const router = express.Router();
+router.use(isAuth);
+router.route('/').get(controller.list).post(validateTransaction(), controller.create);
+router.use('/:id', controller.validateId);
+router.route('/:id').get(controller.read).patch(validateTransaction(true), controller.update).delete(controller.remove);
+module.exports = router;

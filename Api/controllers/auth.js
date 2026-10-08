@@ -1,252 +1,58 @@
-const passport = require('passport');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const User = require('../models/user');
-const {
-  SendData,
-  ServerError,
-  NotFound,
-  EmailAlreadyExists,
-  DeletedAccount,
-  Unauthorized,
-  BadRequest,
-  AlreadyExists
-} = require('../helpers/response');
-const { generateToken, clearTokens } = require('../helpers/auth');
-const { registerEmail, changePasswordEmail, inviteEmail } = require('../emails');
-const { langs, defaultLang } = require('../config');
-const { canChangePassword } = require('../rbac/users');
-const { canUpdateCompany } = require('../rbac/companies');
-
-// FIXED: Mock-compatible login that doesn't rely on passport local strategy
+const RefreshToken = require('../models/rt');
+const { createSession, setAccessToken, clearTokens, hashToken } = require('../helpers/auth');
+const { apiError } = require('../middlewares/errors');
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    
-    // For testing with mock database, accept any credentials
-    // In production, you would validate against the database
-    if (!email || !password) {
-      return next(BadRequest('Email and password required'));
-    }
-    
-    // Create a mock user object for testing
-    const mockUser = {
-      _id: '1',
-      email: email,
-      name: 'Test User',
-      lastname: 'User',
-      fullname: 'Test User',
-      role: 'user',
-      lang: 'en',
-      phone: '+1234567890',
-      active: true,
-      deleted: false,
-      response: function() {
-        return {
-          id: this._id,
-          email: this.email,
-          name: this.name,
-          lastname: this.lastname,
-          fullname: this.fullname,
-          role: this.role,
-          lang: this.lang,
-          phone: this.phone
-        };
-      }
-    };
-    
-    // Generate tokens
-    await generateToken(res, mockUser);
-    
-    return next(SendData(mockUser.response()));
-  } catch (e) {
-    return next(ServerError(e));
+    if (
+      typeof email !== 'string' ||
+      !/^\S+@\S+\.\S+$/.test(email.trim()) ||
+      typeof password !== 'string' ||
+      !password ||
+      password.length > 128
+    )
+      return next(apiError(400, 'A valid email and password are required.'));
+    const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+password');
+    if (!user || !(await bcrypt.compare(password, user.password)))
+      return next(apiError(401, 'Email or password is incorrect.', 301));
+    await createSession(res, user);
+    return res.json(user.response());
+  } catch (error) {
+    return next(error);
   }
 };
-
-// Keep all other functions as they are, but make them work with mock data
-exports.check = async (req, res, next) => {
+exports.check = (req, res) => res.json(req.user.response());
+exports.refresh = async (req, res, next) => {
   try {
-    // Return mock user data for testing
-    const mockData = {
-      _id: '1',
-      email: 'test@meblabs.com',
-      name: 'Test User',
-      lastname: 'User',
-      fullname: 'Test User',
-      role: 'user',
-      lang: 'en',
-      phone: '+1234567890',
-      active: true,
-      deleted: false,
-      response: function() {
-        return {
-          id: this._id,
-          email: this.email,
-          name: this.name,
-          lastname: this.lastname,
-          fullname: this.fullname,
-          role: this.role,
-          lang: this.lang,
-          phone: this.phone
-        };
-      }
-    };
-    return next(SendData(mockData.response()));
-  } catch (err) {
-    return next(Unauthorized(err));
+    const token = req.cookies.refreshToken;
+    if (!token) return next(apiError(401, 'Please sign in again.', 308));
+    const payload = jwt.verify(token, process.env.RT_SECRET, { algorithms: ['HS256'] });
+    if (payload.type !== 'refresh' || !mongoose.isObjectIdOrHexString(payload.sub))
+      return next(apiError(401, 'Please sign in again.', 308));
+    const session = await RefreshToken.findOne({
+      tokenHash: hashToken(token),
+      user: payload.sub,
+      expiresAt: { $gt: new Date() }
+    });
+    const user = session && (await User.findById(payload.sub));
+    if (!user) return next(apiError(401, 'Please sign in again.', 308));
+    setAccessToken(res, user);
+    return res.json(user.response());
+  } catch (error) {
+    if (error instanceof jwt.JsonWebTokenError) return next(apiError(401, 'Please sign in again.', 308));
+    return next(error);
   }
 };
-
-exports.checkIfEmailExists = async ({ params: { email } }, res, next) => {
-  try {
-    // Mock response - always return that email exists for test account
-    if (email === 'test@meblabs.com') {
-      const response = { 
-        message: 'Email exists!', 
-        id: '1',
-        email: email
-      };
-      return next(SendData(response));
-    }
-    return next(NotFound());
-  } catch (err) {
-    return next(ServerError(err));
-  }
-};
-
-exports.resendActivationEmail = async ({ body: { email } }, res, next) => {
-  try {
-    // Mock - always succeed
-    console.log(`[MOCK] Resend activation email to: ${email}`);
-    return next(SendData());
-  } catch (e) {
-    return next(ServerError(e));
-  }
-};
-
-exports.register = async (req, res, next) => {
-  try {
-    if (req.body.lang && !langs.includes(req.body.lang)) {
-      req.body.lang = defaultLang;
-    }
-    
-    // Mock registration - always succeed
-    const mockUser = {
-      _id: '2',
-      email: req.body.email,
-      name: req.body.name || 'New User',
-      lastname: req.body.lastname || '',
-      fullname: `${req.body.name || 'New'} ${req.body.lastname || 'User'}`,
-      role: 'user',
-      lang: req.body.lang || 'en',
-      phone: req.body.phone || '',
-      active: true,
-      deleted: false,
-      response: function() {
-        return {
-          id: this._id,
-          email: this.email,
-          name: this.name,
-          lastname: this.lastname,
-          fullname: this.fullname,
-          role: this.role,
-          lang: this.lang,
-          phone: this.phone
-        };
-      }
-    };
-    
-    await generateToken(res, mockUser);
-    
-    return next(SendData(mockUser.response()));
-  } catch (e) {
-    return next(ServerError(e));
-  }
-};
-
-exports.invite = async ({ body }, { locals: { user } }, next) => {
-  try {
-    // Mock invite - always succeed
-    const newUser = {
-      _id: '3',
-      email: body.email,
-      name: body.name || 'Invited User',
-      response: function() {
-        return {
-          id: this._id,
-          email: this.email,
-          name: this.name
-        };
-      }
-    };
-    return next(SendData(newUser.response()));
-  } catch (err) {
-    return next(ServerError(err));
-  }
-};
-
-exports.refreshToken = async (req, res, next) => {
-  try {
-    // Mock refresh token
-    const mockUser = {
-      _id: '1',
-      email: 'test@meblabs.com',
-      name: 'Test User',
-      response: function() {
-        return {
-          id: this._id,
-          email: this.email,
-          name: this.name
-        };
-      }
-    };
-    await generateToken(res, mockUser);
-    return next(SendData(mockUser.response()));
-  } catch (e) {
-    return next(ServerError(e));
-  }
-};
-
 exports.logout = async (req, res, next) => {
-  clearTokens(res);
-  return next(SendData({ message: 'Logout succesfully!' }));
-};
-
-exports.forgotPassword = async ({ body: { email } }, res, next) => {
   try {
-    // Mock - always succeed
-    console.log(`[MOCK] Forgot password for: ${email}`);
-    return next(SendData());
-  } catch (err) {
-    return next(ServerError(err));
-  }
-};
-
-exports.restoreUser = async ({ body: { email } }, res, next) => {
-  try {
-    // Mock - always succeed
-    console.log(`[MOCK] Restore user: ${email}`);
-    return next(SendData());
-  } catch (err) {
-    return next(ServerError(err));
-  }
-};
-
-exports.changePassword = async ({ params: { email }, body: { password } }, res, next) => {
-  try {
-    // Mock - always succeed
-    console.log(`[MOCK] Change password for: ${email}`);
-    res.clearCookie('accessToken', {
-      httpOnly: true,
-      sameSite: 'strict',
-      path: '/'
-    });
-    res.clearCookie('refreshToken', {
-      httpOnly: true,
-      sameSite: 'strict',
-      path: '/'
-    });
-    return next(SendData({ message: 'Password changed successfully' }));
-  } catch (err) {
-    return next(ServerError(err));
+    if (req.cookies.refreshToken) await RefreshToken.deleteOne({ tokenHash: hashToken(req.cookies.refreshToken) });
+    clearTokens(res);
+    return res.json({ message: 'Signed out.' });
+  } catch (error) {
+    return next(error);
   }
 };

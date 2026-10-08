@@ -1,22 +1,23 @@
-const fs = require('fs');
-const path = require('path');
-const dotenv = require('dotenv');
-
-if (process.env.ENV === 'dev' && fs.existsSync(path.resolve(__dirname, '.env.development'))) {
-  dotenv.config({
-    path: path.resolve(__dirname, '.env.development'),
-    override: true
-  });
-} else {
-  dotenv.config();
-}
-
+require('dotenv').config();
 const app = require('./app');
-
-// Replace MongoDB connection with mock database
-const { connectDB } = require('./db/mockDatabase');
-connectDB();
-
-app.listen(process.env.PORT || 4000, () => {
-  console.log(`Server running on port ${process.env.PORT || 4000}`);
+const { connect, close } = require('./db/connect');
+const start = async () => {
+  await connect();
+  const port = Number(process.env.PORT || 4000);
+  const server = app.listen(port, '127.0.0.1', () => console.info('Expense Diary API: http://127.0.0.1:' + port));
+  let shuttingDown = false;
+  const shutdown = () => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    server.close(async () => {
+      await close();
+      process.exit(0);
+    });
+  };
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
+};
+start().catch(error => {
+  console.error('API startup failed: ' + error.message);
+  process.exitCode = 1;
 });
