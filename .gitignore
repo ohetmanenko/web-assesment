@@ -87,3 +87,7 @@ dbdata
 node_modules/
 coverage/
 dist/
+
+# Generated delivery documents and rendering previews
+output/pdf/
+tmp/pdfs/

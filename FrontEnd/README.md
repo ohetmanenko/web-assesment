@@ -9,3 +9,5 @@ The sign-in and diary headers include an English/Italian selector. `src/helpers/
 Desktop uses a sortable table; below 768 px, full cards show type, amount, category/date and the entire description. Edit/Delete live in a three-dot menu. Calendar dates remain separate from record timestamps: focus or tap a date to see its creation time (`HH:mm:ss`). Date ordering uses creation time to break ties within a day, and the mobile menu also supports date/amount sorting.
 
 Unused original template components remain outside the active dependency graph.
+
+`npm test` runs seven native Node tests against the actual Axios session coordinator in `src/helpers/core/session.mjs`. They cover concurrent refresh, business errors after refresh, invalid/transient refresh failures, logout ordering, stale initial checks and provider cleanup. Refresh/logout use POST. Stale transaction list requests are cancelled after successful writes; form submission has a synchronous in-flight guard.

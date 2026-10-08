@@ -61,26 +61,37 @@ test('missing, malformed and expired access tokens are rejected', async () => {
 test('a refresh cookie restores access, and logout revokes that refresh session', async () => {
   const response = await login(request(app)).expect(200);
   const refresh = cookie(response, 'refreshToken');
-  const renewed = await request(app).get('/auth/rt').set('Cookie', refresh).expect(200);
+  const renewed = await request(app).post('/auth/rt').set('Cookie', refresh).expect(200);
   expect(renewed.body._id).toBe(user.id);
   await request(app).get('/auth/check').set('Cookie', cookie(renewed, 'accessToken')).expect(200);
-  const logout = await request(app).get('/auth/logout').set('Cookie', refresh).expect(200);
+  const logout = await request(app).post('/auth/logout').set('Cookie', refresh).expect(200);
   expect(logout.headers['set-cookie']).toHaveLength(2);
   expect(await RefreshToken.countDocuments()).toBe(0);
-  await request(app).get('/auth/rt').set('Cookie', refresh).expect(401);
+  await request(app).post('/auth/rt').set('Cookie', refresh).expect(401);
+});
+
+test('GET requests cannot refresh or revoke a session', async () => {
+  const response = await login(request(app)).expect(200);
+  const refresh = cookie(response, 'refreshToken');
+  for (const path of ['/auth/rt', '/auth/logout']) {
+    const rejected = await request(app).get(path).set('Cookie', refresh).expect(404);
+    expect(rejected.headers['set-cookie']).toBeUndefined();
+  }
+  expect(await RefreshToken.countDocuments()).toBe(1);
+  await request(app).post('/auth/rt').set('Cookie', refresh).expect(200);
 });
 
 test('missing, forged, expired and wrong-purpose refresh tokens are rejected', async () => {
-  await request(app).get('/auth/rt').expect(401);
-  await request(app).get('/auth/rt').set('Cookie', 'refreshToken=invalid').expect(401);
+  await request(app).post('/auth/rt').expect(401);
+  await request(app).post('/auth/rt').set('Cookie', 'refreshToken=invalid').expect(401);
   const expired = jwt.sign({ type: 'refresh' }, process.env.RT_SECRET, { subject: user.id, expiresIn: -1 });
   await request(app)
-    .get('/auth/rt')
+    .post('/auth/rt')
     .set('Cookie', 'refreshToken=' + expired)
     .expect(401);
   const wrongPurpose = jwt.sign({ type: 'access' }, process.env.RT_SECRET, { subject: user.id });
   await request(app)
-    .get('/auth/rt')
+    .post('/auth/rt')
     .set('Cookie', 'refreshToken=' + wrongPurpose)
     .expect(401);
 });
@@ -90,5 +101,5 @@ test('deleted users cannot use existing access or refresh sessions', async () =>
   await login(agent).expect(200);
   await User.deleteOne({ _id: user.id });
   await agent.get('/auth/check').expect(401);
-  await agent.get('/auth/rt').expect(401);
+  await agent.post('/auth/rt').expect(401);
 });

@@ -131,5 +131,7 @@
   "category.Freelance": "Freelance",
   "category.Investments": "Investments",
   "category.Gift": "Gift",
-  "format.date": "MMM D, YYYY"
+  "format.date": "MMM D, YYYY",
+  "Transaction changed. Reload it and try again.": "Transaction changed. Reload it and try again.",
+  "Request body must contain valid JSON.": "Request body must contain valid JSON."
 }

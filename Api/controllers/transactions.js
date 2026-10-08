@@ -59,12 +59,20 @@ exports.update = async (req, res, next) => {
     if (!previous) return next(apiError(404, 'Transaction not found.'));
     const data = await categoryData(req.body, req.user.id, previous);
     await rememberCategory(req.user.id, data.type, data.category);
+    // Category validation depends on this pair; do not overwrite a concurrent reclassification.
     const record = await Transaction.findOneAndUpdate(
-      { _id: req.params.id, user: req.user.id },
+      { _id: req.params.id, user: req.user.id, type: previous.type, category: previous.category },
       { $set: data },
       { new: true, runValidators: true }
     );
-    if (!record) return next(apiError(404, 'Transaction not found.'));
+    if (!record) {
+      const exists = await Transaction.exists({ _id: req.params.id, user: req.user.id });
+      return next(
+        exists
+          ? apiError(409, 'Transaction changed. Reload it and try again.')
+          : apiError(404, 'Transaction not found.')
+      );
+    }
     return res.json(record.response());
   } catch (error) {
     return next(error);

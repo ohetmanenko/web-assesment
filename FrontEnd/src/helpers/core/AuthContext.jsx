@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Api from './Api';
+import { createAuthSession } from './session.mjs';
 
 export const AuthStatus = { Loading: 0, SignedIn: 1, SignedOut: -1 };
 const AuthContext = createContext(null);
@@ -9,69 +10,25 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthContextProvider = ({ children }) => {
   const [authStatus, setAuthStatus] = useState(AuthStatus.Loading);
   const [logged, setLogged] = useState(null);
-  const refreshRequest = useRef(null);
+  const session = useRef(null);
 
-  const signIn = useCallback(async (email, password) => {
-    const { data } = await Api.post('/auth/login', { email, password });
-    setLogged(data);
-    setAuthStatus(AuthStatus.SignedIn);
-  }, []);
-  const signOut = useCallback(async () => {
-    await Api.get('/auth/logout');
-    setLogged(null);
-    setAuthStatus(AuthStatus.SignedOut);
-  }, []);
+  const signIn = useCallback((email, password) => session.current.signIn(email, password), []);
+  const signOut = useCallback(() => session.current.signOut(), []);
 
   useEffect(() => {
-    let active = true;
-    const interceptor = Api.interceptors.response.use(
-      response => response,
-      async error => {
-        const request = error.config;
-        const skipRefresh = ['/auth/login', '/auth/rt', '/auth/logout'].includes(request?.url);
-        if (error.response?.status !== 401 || !request || request.retried || skipRefresh) throw error;
-        request.retried = true;
-        try {
-          if (!refreshRequest.current) {
-            refreshRequest.current = Api.get('/auth/rt')
-              .then(({ data }) => {
-                if (active) {
-                  setLogged(data);
-                  setAuthStatus(AuthStatus.SignedIn);
-                }
-              })
-              .finally(() => {
-                refreshRequest.current = null;
-              });
-          }
-          await refreshRequest.current;
-          return await Api(request);
-        } catch {
-          if (active) {
-            setLogged(null);
-            setAuthStatus(AuthStatus.SignedOut);
-          }
-          throw error;
-        }
+    const current = createAuthSession(Api, {
+      onSignedIn: user => {
+        setLogged(user);
+        setAuthStatus(AuthStatus.SignedIn);
+      },
+      onSignedOut: () => {
+        setLogged(null);
+        setAuthStatus(AuthStatus.SignedOut);
       }
-    );
-    Api.get('/auth/check')
-      .then(({ data }) => {
-        if (active) {
-          setLogged(data);
-          setAuthStatus(AuthStatus.SignedIn);
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setLogged(null);
-          setAuthStatus(AuthStatus.SignedOut);
-        }
-      });
-    return () => {
-      active = false;
-      Api.interceptors.response.eject(interceptor);
-    };
+    });
+    session.current = current;
+    current.check();
+    return () => current.dispose();
   }, []);
 
   const value = useMemo(() => ({ authStatus, logged, signIn, signOut }), [authStatus, logged, signIn, signOut]);

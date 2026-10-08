@@ -60,6 +60,46 @@ test('income and expenses are listed by calendar date descending', async () => {
   expect(body[0].type).toBe('income');
 });
 
+test('same-day records sort by creation time and ID; editing does not move an older record first', async () => {
+  const ids = [1, 2, 3].map(value => new mongoose.Types.ObjectId(value.toString(16).padStart(24, '0')));
+  await Transaction.insertMany(
+    ids.map((_id, index) => ({
+      ...entry,
+      _id,
+      user: user.id,
+      createdAt: new Date(index === 0 ? '2026-10-08T08:00:00Z' : '2026-10-08T09:00:00Z')
+    }))
+  );
+  await agent
+    .patch('/transactions/' + ids[0])
+    .send({ description: 'Edited later' })
+    .expect(200);
+  const { body } = await agent.get('/transactions').expect(200);
+  expect(body.map(item => item._id)).toEqual([...ids].reverse().map(id => id.toString()));
+  expect(body[2].createdAt).toBe('2026-10-08T08:00:00.000Z');
+});
+
+test('a PATCH cannot overwrite a concurrent transaction type and category change', async () => {
+  const created = await agent.post('/transactions').send(entry).expect(201);
+  const findOne = Transaction.findOne.bind(Transaction);
+  const read = jest.spyOn(Transaction, 'findOne').mockImplementationOnce(async (...args) => {
+    const previous = await findOne(...args);
+    await Transaction.updateOne({ _id: created.body._id }, { $set: { type: 'income', category: 'Salary' } });
+    return previous;
+  });
+  try {
+    const response = await agent
+      .patch('/transactions/' + created.body._id)
+      .send({ description: 'A stale description update' })
+      .expect(409);
+    expect(response.body.message).toBe('Transaction changed. Reload it and try again.');
+    const stored = await Transaction.findById(created.body._id);
+    expect(stored).toMatchObject({ type: 'income', category: 'Salary', description: entry.description });
+  } finally {
+    read.mockRestore();
+  }
+});
+
 test.each([
   ['type', 'other'],
   ['type', null],
@@ -175,6 +215,11 @@ test("users cannot list, read, edit or delete someone else's transactions", asyn
 });
 
 test('malformed JSON returns 400, and unsupported template routes return 404', async () => {
-  await agent.post('/transactions').set('Content-Type', 'application/json').send('{"type":').expect(400);
+  const response = await agent
+    .post('/transactions')
+    .set('Content-Type', 'application/json')
+    .send('{"private-description": "not-for-error-output",')
+    .expect(400);
+  expect(response.body).toEqual({ error: 400, message: 'Request body must contain valid JSON.', data: {} });
   await agent.get('/companies').expect(404);
 });

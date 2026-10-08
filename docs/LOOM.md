@@ -41,7 +41,7 @@ Sign out and sign back in. Expected: same saved records.
 ## 2:50–3:40 — API tests and structure
 
 Show `npm test` and the three suites: auth, transactions and categories.
-Explain the 66 tests: real MongoDB CRUD, invalid sums/dates, missing records, token/password failures, type/category validation, Title Case normalization and user isolation.
+Explain the 69 API tests: real MongoDB CRUD, invalid sums/dates, missing records, token/password failures, type/category validation, Title Case normalization, user isolation, stable ordering and concurrent classification conflicts. Briefly show the seven frontend session tests, including refresh/logout races and business failures after successful refresh.
 
 Show the active route/controller/model/validation files. Explain:
 
@@ -52,7 +52,7 @@ Show the active route/controller/model/validation files. Explain:
 
 ## 3:40–4:20 — Tradeoffs
 
-"For the MVP, the list, filters and totals run on the loaded records. The next steps would be server pagination and reporting, refresh rotation and browser automation tests. The interface supports English and Italian, and the currency remains USD. I used the existing components and focused on complete CRUD and useful errors."
+"For the MVP, the list, filters and totals run on the loaded records. The next steps would be server pagination and reporting, refresh rotation and browser automation tests. The interface supports English and Italian, and the currency remains USD. I retained the supplied stack and project structure, built the diary screens from Ant Design primitives, and focused on complete CRUD and useful errors."
 
 Mention the security cleanup only if it has already been discussed with the company; do not display or run the original payload. Use a fresh clean source export and new Git history for eventual publication.
 

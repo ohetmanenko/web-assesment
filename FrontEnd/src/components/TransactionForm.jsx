@@ -1,5 +1,5 @@
 import { useDiary } from '../helpers/core/i18n';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   App,
@@ -28,6 +28,7 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
   const [form] = Form.useForm();
   const { message } = App.useApp();
   const [saving, setSaving] = useState(false);
+  const submitting = useRef(false);
   const [error, setError] = useState('');
   const [catalog, setCatalog] = useState(null);
   const [categoryLoading, setCategoryLoading] = useState(true);
@@ -130,6 +131,8 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
     setCategoryNotice('');
   };
   const submit = async values => {
+    if (submitting.current) return;
+    submitting.current = true;
     setSaving(true);
     setError('');
     const data = {
@@ -155,6 +158,7 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
     } catch (err) {
       setError(getApiError(err));
     } finally {
+      submitting.current = false;
       setSaving(false);
     }
   };

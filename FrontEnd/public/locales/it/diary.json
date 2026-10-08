@@ -131,5 +131,7 @@
   "category.Freelance": "Lavoro autonomo",
   "category.Investments": "Investimenti",
   "category.Gift": "Regalo",
-  "format.date": "D MMM YYYY"
+  "format.date": "D MMM YYYY",
+  "Transaction changed. Reload it and try again.": "La transazione è stata modificata. Ricaricala e riprova.",
+  "Request body must contain valid JSON.": "Il corpo della richiesta deve contenere JSON valido."
 }

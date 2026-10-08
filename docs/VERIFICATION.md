@@ -2,7 +2,8 @@
 
 ## Automated checks
 
-- `npm test`: 3 suites, **66 tests passed**, using Jest 30.5.2, Supertest and isolated MongoDB. Category tests cover Title Case, duplicate prevention, type changes, optional Other names, legacy values, persistence after deletion and user isolation.
+- `npm test`: **69 API tests in 3 suites + 7 frontend session tests passed**. API tests use Jest 30.5.2, Supertest and isolated MongoDB. Frontend tests use Node's native runner, actual Axios interceptors and a controlled adapter.
+- `npm run test:coverage --prefix Api`: **94.84% statements, 89.28% branches, 100% functions, 95.41% lines** in the explicit active scope from `Api/jest.config.js`. Model definitions, startup, dormant modules and the UI are outside these percentages.
 - `npm run lint`: API and frontend passed.
 - `npm run format:check`: active API/frontend files passed.
 - `npm run build`: passed with Vite 8.3.3; one bundle-size warning remains (about 408 KB gzipped).
@@ -10,8 +11,9 @@
 - `git diff --check`: passed.
 - Original evidence SHA-256 still matches the recorded original.
 - Local env files and evidence are ignored; env files have been removed from the Git index.
-- The earlier 61-file allowlisted clean export passed `npm run setup`, `npm run build` and `npm run seed`. Its API started on a temporary port 4001 and returned HTTP 200; that temporary process was stopped after verification. Existing demo records were preserved. The current allowlist contains 75 files, including categories, the form skeleton, i18next configuration and all English/Italian namespaces.
-- The English/Italian diary dictionaries contain matching sets of **133 keys**, with no empty Italian values.
+- The final-review 77-file clean application export passed `npm run setup`, `npm run build` and the complete `npm test` command independently. Its actual `Api/index.js` started on temporary port 4001 with a separate temporary MongoDB; `/` returned 200 and unauthenticated `/transactions` returned 401. Both temporary processes were stopped; the development database was never used. All 70 app/config/source files matched the working checkout byte-for-byte. Final report sources and diagrams are added to the delivery allowlist separately.
+- Verified export: `.local/submission/2026-10-08T11-27-00-281Z-f0a008`. Application-source signature: `a6b97f9bdbf8b8f3b5f2a61f553a2f59836476c3dbfda81456f9702b6c70919d` (sorted relative path, NUL, bytes, NUL; excludes READMEs, docs and export script).
+- The English/Italian diary dictionaries contain matching sets of **135 keys**, with no empty Italian values.
 
 ## Manual app checks
 
@@ -44,6 +46,7 @@ Using the local MongoDB fallback:
 25. Switch to Italian, reload, and verify the selected language and HTML `lang` persist. The diary, form, calendar dates, USD formatting, preset categories and pagination follow the language; user-defined names and descriptions remain unchanged. The Italian login screen also includes the control. Return to English after verification.
 26. In the Italian Other autocomplete, `tras` suggests `Trasporti`; selecting it reuses canonical `Transport` in Category and hides the optional name. Clear removes the value and its own button. A malformed amount and missing category produce Italian validation messages.
 27. At 320 and 390 px, the localized header and mobile list have no horizontal document overflow. Focusing/tapping a date produces only the local creation time, such as `13:32:34`.
+28. After the final session review, sign out, fill demo credentials, sign in, open/cancel the transaction form and reload. The authenticated diary returns, all existing records remain present and the inspected tab reports no console errors or warnings. This smoke check does not replace the controlled concurrency tests.
 
 Local browser screenshots are under ignored `.local/screenshots`. Real user records are not exported. Screenshots from the QA cycle are local verification evidence, not submission assets.
 
@@ -64,6 +67,19 @@ Upgrade references: [Jest 30 guide](https://jestjs.io/docs/upgrading-to-jest30),
 Docker CLI and Compose are installed, but Engine reports “Docker Desktop is unable to start”; WSL is not installed. The attempted non-admin WSL command could not install it in this session. Complete WSL setup from an administrator terminal and restart Windows if prompted.
 
 Docker-backed startup and Docker-volume persistence **have not been verified on this machine**. The app, database connection ordering, seed and persistence were verified using the local MongoDB fallback. The fallback uses MongoDB 8.2.6; Compose specifies 8.0.
+
+Final recheck: Docker CLI 29.8.2 is installed at the per-user Docker Desktop path; Engine still reports that Docker Desktop is unable to start. Compose configuration validation passes. npm audit was rerun during final review and confirmed the counts above.
+
+## Final code review
+
+- Refresh/logout use POST. Regression tests confirm GET returns 404 without setting cookies or revoking a refresh session.
+- Malformed JSON receives a fixed message instead of parser text containing submitted fragments.
+- PATCH atomically checks the type/category snapshot used during validation; a concurrent reclassification returns 409. This does not implement general stale-browser-form versioning.
+- Same-day sorting is regression-tested with date, createdAt and ID, including after an edit.
+- A business request failing after successful refresh no longer signs the user out. Concurrent 401s share refresh; temporary refresh failures preserve the current session; logout waits for a pending refresh; old bootstrap/provider callbacks cannot overwrite newer state.
+- Superseded transaction loads are cancelled and cannot replace newer saved/deleted state. This list race is reviewed in code; no browser timing automation was added.
+- Login and transaction forms use synchronous duplicate-submit guards. These are client-page guards, not server-side idempotency keys.
+- Removed obsolete default-theme/stylelint commands that depended on absent tools/files.
 
 ## Before submission
 

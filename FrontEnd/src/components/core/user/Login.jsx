@@ -1,6 +1,6 @@
 import { useDiary } from '../../../helpers/core/i18n';
 import LanguageSelector from '../controls/LanguageSelector';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Button, Form, Input, Tooltip, Typography } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookOpen, faArrowRight, faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons';
@@ -14,6 +14,7 @@ const Login = () => {
   const { signIn } = useAuth();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const submitting = useRef(false);
   const [error, setError] = useState('');
   useEffect(() => {
     const names = form
@@ -30,6 +31,8 @@ const Login = () => {
     setError('');
   };
   const onFinish = async values => {
+    if (submitting.current) return;
+    submitting.current = true;
     setLoading(true);
     setError('');
     try {
@@ -37,6 +40,7 @@ const Login = () => {
     } catch (err) {
       setError(getApiError(err));
     } finally {
+      submitting.current = false;
       setLoading(false);
     }
   };
@@ -83,6 +87,7 @@ const Login = () => {
             layout="vertical"
             onFinish={onFinish}
             requiredMark={false}
+            disabled={loading}
             initialValues={{ email: DEMO_CREDENTIALS.email }}
           >
             <Form.Item

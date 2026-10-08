@@ -15,6 +15,6 @@ if (process.env.NODE_ENV !== 'test') {
 }
 router.post('/login', login);
 router.get('/check', isAuth, check);
-router.get('/rt', refresh);
-router.get('/logout', logout);
+router.post('/rt', refresh);
+router.post('/logout', logout);
 module.exports = router;

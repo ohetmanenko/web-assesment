@@ -74,7 +74,7 @@ npm run format:check
 npm run build
 ```
 
-Jest + Supertest run **66 integration tests** against isolated MongoDB processes; they never use the development database or Docker. Test coverage includes actual password hashing/login, invalid and expired tokens, refresh/logout, complete CRUD, exact cents, leap dates, invalid values, malformed/missing IDs, category normalization, category/type consistency and cross-user isolation. First test execution downloads a MongoDB binary; later runs reuse its cache.
+The root test command runs **69 API integration tests** with Jest + Supertest against isolated MongoDB processes and **7 frontend session tests** with Node's native runner and actual Axios interceptors. They never use the development database or Docker. API cases include password hashing/login, invalid/expired tokens, POST refresh/logout, complete CRUD, exact cents, leap dates, malformed/missing IDs, category normalization/type consistency, ownership, deterministic ordering and concurrent reclassification. Frontend cases cover shared refresh, retry failures, transient refresh errors, logout ordering, stale bootstrap and disposal. First API test execution downloads a MongoDB binary; later runs reuse its cache.
 
 Production output is `FrontEnd/dist`. The Vite build reports a large chunk warning; bundle splitting is a possible follow-up for this small MVP.
 
@@ -90,8 +90,8 @@ Authentication uses HttpOnly, SameSite=Lax cookies. Responses never expose passw
 | ------ | ------------------- | ------------------------------------------------------- |
 | POST   | `/auth/login`       | Public profile and access/refresh cookies               |
 | GET    | `/auth/check`       | Current public profile, or 401                          |
-| GET    | `/auth/rt`          | Refresh access cookie using a valid persisted session   |
-| GET    | `/auth/logout`      | Revoke refresh session and clear cookies                |
+| POST   | `/auth/rt`          | Refresh access cookie using a valid persisted session   |
+| POST   | `/auth/logout`      | Revoke refresh session and clear cookies                |
 | GET    | `/transactions`     | Current user's transactions, newest calendar date first |
 | GET    | `/categories`       | Suggested and custom categories grouped by type         |
 | POST   | `/transactions`     | Create a transaction (201)                              |
@@ -121,15 +121,15 @@ Example create body:
 - Changing transaction type clears an incompatible selected category and any unfinished custom name in the form. **Other** is shared; a custom name can be retained if it is already registered for both types. The API rejects type changes that silently retain incompatible categories. Legacy custom values remain available; editing an incompatible legacy preset prompts for a valid category.
 - Description: trimmed, at most 500 characters.
 - Owner comes exclusively from the verified session. Client-supplied owners, unknown properties and MongoDB operators are rejected.
-- Errors: 400 for invalid input; 401 for missing/invalid authentication; 404 for missing or foreign records. Shape: `{ "error": 400, "message": "...", "data": { "field": "..." } }` (field is optional).
+- Errors: 400 for invalid input; 401 for missing/invalid authentication; 404 for missing or foreign records; 409 when type/category changes concurrently between validation and update. Shape: `{ "error": 400, "message": "...", "data": { "field": "..." } }` (field is optional).
 
 Created records include `_id`, all transaction fields, `createdAt` and `updatedAt`. List returns an array; create/read/update return a single record.
 
 ## Implementation choices and MVP limits
 
-The app mounts explicit auth, transaction and category routes. Mongoose provides persistence, model constraints and owner-scoped indexes; request validation returns useful errors before database access. UI changes follow successful API responses and surface failures. The form displays a skeleton while fetching categories, with a retry action on failure; saving keeps the entered fields visible and disables controls until the response arrives.
+The app mounts explicit auth, transaction and category routes. Mongoose provides persistence, model constraints and owner-scoped indexes; request validation returns useful errors before database access. PATCH checks its original type/category in the atomic update predicate to protect classification-dependent validation. This is not full versioned conflict detection for stale browser forms. UI changes follow successful API responses and surface failures; stale list requests are cancelled so they cannot replace newer saved/deleted state. The form displays a skeleton while fetching categories, with a retry action on failure; saving keeps the entered fields visible and disables controls until the response arrives. Synchronous submit guards avoid duplicate login/form requests from repeated clicks.
 
-Access tokens live for 15 minutes; refresh tokens live for 7 days and are stored as SHA-256 hashes with an expiry index. The frontend retries an authenticated request once after a shared refresh request. Logout revokes refresh and removes browser cookies; a copied access token remains valid until its 15-minute expiry. Secure cookies are enabled with `NODE_ENV=production`, which requires HTTPS.
+Access tokens live for 15 minutes; refresh tokens live for 7 days and are stored as SHA-256 hashes with an expiry index. The frontend retries an authenticated request once after a shared refresh request. An error from the retried business request does not invalidate a successfully refreshed session. Logout waits for any pending refresh, revokes refresh and removes browser cookies; a copied access token remains valid until its 15-minute expiry. Secure cookies are enabled with `NODE_ENV=production`, which requires HTTPS.
 
 Totals and filters run over the user's loaded records. Pagination is client-side (8 entries per page). This is suitable for the MVP; server pagination, filter endpoints, aggregate reporting, refresh-token rotation, accessibility review and browser automation tests are follow-up work. Registration, password reset, uploads, multiple currencies and legacy company/admin features are outside this implementation.
 

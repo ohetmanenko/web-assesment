@@ -1,6 +1,6 @@
 import { useDiary } from '../helpers/core/i18n';
 import LanguageSelector from '../components/core/controls/LanguageSelector';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   App,
@@ -69,21 +69,38 @@ const Home = () => {
   const [page, setPage] = useState(1);
   const [sorting, setSorting] = useState({ field: 'date', order: 'descend' });
   const [signingOut, setSigningOut] = useState(false);
+  const loadRequest = useRef(null);
+
+  const cancelLoad = useCallback(() => {
+    loadRequest.current?.abort();
+    loadRequest.current = null;
+    setLoading(false);
+  }, []);
 
   const load = useCallback(async () => {
+    loadRequest.current?.abort();
+    const controller = new AbortController();
+    loadRequest.current = controller;
     setLoading(true);
     setLoadError('');
     try {
-      const { data } = await Api.get('/transactions');
-      setRecords(data);
+      const { data } = await Api.get('/transactions', { signal: controller.signal });
+      if (loadRequest.current === controller) setRecords(data);
     } catch (error) {
-      setLoadError(getApiError(error));
+      if (loadRequest.current === controller && !controller.signal.aborted) setLoadError(getApiError(error));
     } finally {
-      setLoading(false);
+      if (loadRequest.current === controller) {
+        loadRequest.current = null;
+        setLoading(false);
+      }
     }
   }, []);
   useEffect(() => {
     load();
+    return () => {
+      loadRequest.current?.abort();
+      loadRequest.current = null;
+    };
   }, [load]);
 
   const totals = useMemo(
@@ -129,12 +146,14 @@ const Home = () => {
     setOpen(true);
   };
   const saved = record => {
+    cancelLoad();
     setRecords(previous => sortTransactions([...previous.filter(item => item._id !== record._id), record]));
   };
   const remove = async record => {
     setDeleting(record._id);
     try {
       await Api.delete('/transactions/' + record._id);
+      cancelLoad();
       setRecords(previous => previous.filter(item => item._id !== record._id));
       setDeleteTarget(null);
       message.success(t('Transaction deleted.'));
@@ -193,7 +212,7 @@ const Home = () => {
       }
     >
       {!records.length && !loadError && (
-        <Button type="primary" onClick={add}>
+        <Button type="primary" onClick={add} disabled={loading}>
           {t('Add your first transaction')}
         </Button>
       )}
@@ -290,7 +309,13 @@ const Home = () => {
             </h1>
             <p className="muted">{t('Every entry is a step toward a clearer picture.')}</p>
           </div>
-          <Button type="primary" size="large" icon={<FontAwesomeIcon icon={faPlus} />} onClick={add}>
+          <Button
+            type="primary"
+            size="large"
+            icon={<FontAwesomeIcon icon={faPlus} />}
+            onClick={add}
+            disabled={loading && !records.length}
+          >
             {t('Add transaction')}
           </Button>
         </section>
