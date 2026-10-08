@@ -2,7 +2,7 @@
 
 ## Automated checks
 
-- `npm test`: **69 API tests in 3 suites + 15 frontend tests (7 session + 8 amount-input) passed**. API tests use Jest 30.5.2, Supertest and isolated MongoDB. Session tests use Node's native runner, actual Axios interceptors and a controlled adapter; eight amount-input tests exercise the parsing/formatting helpers.
+- `npm test`: **69 API tests in 3 suites + 19 frontend tests (7 session + 8 amount-input + 4 shortcut) passed**. API tests use Jest 30.5.2, Supertest and isolated MongoDB. Session tests use Node's native runner, actual Axios interceptors and a controlled adapter; eight amount-input tests exercise the parsing/formatting helpers.
 - `npm run test:coverage --prefix Api`: **94.84% statements, 89.28% branches, 100% functions, 95.41% lines** in the explicit active scope from `Api/jest.config.js`. Model definitions, startup, dormant modules and the UI are outside these percentages.
 - `npm run lint`: API and frontend passed.
 - `npm run format:check`: active API/frontend files passed.
@@ -13,7 +13,7 @@
 - Local env files and evidence are ignored; env files have been removed from the Git index.
 - The final-review 77-file clean application export passed `npm run setup`, `npm run build` and the complete `npm test` command independently. Its actual `Api/index.js` started on temporary port 4001 with a separate temporary MongoDB; `/` returned 200 and unauthenticated `/transactions` returned 401. Both temporary processes were stopped; the development database was never used. All 70 app/config/source files matched the working checkout byte-for-byte. Final report sources and diagrams are added to the delivery allowlist separately.
 - Verified export: `.local/submission/2026-10-08T11-27-00-281Z-f0a008`. Application-source signature: `a6b97f9bdbf8b8f3b5f2a61f553a2f59836476c3dbfda81456f9702b6c70919d` (sorted relative path, NUL, bytes, NUL; excludes READMEs, docs and export script).
-- The English/Italian diary dictionaries contain matching sets of **136 keys**, with no empty Italian values.
+- The English/Italian diary dictionaries contain matching sets of **137 keys**, with no empty Italian values.
 
 ## Manual app checks
 
@@ -50,6 +50,7 @@ Using the local MongoDB fallback. These checks record successive iterations; ear
 29. Move Add transaction into the transaction panel heading, immediately after Refresh. The relocated button opens the same form. At 390 px the actions occupy a separate row below the title without horizontal overflow. Frontend lint, formatting and build pass after this layout-only change.
 30. The demo seed inserts 28 fictional fixtures, with $7,136.17 income, $2,462.25 expenses and $4,673.92 balance. Its second local run inserts zero duplicates. A separate temporary MongoDB check confirms repeat-run preservation of dates/manual edits, unrelated and other-user records, stable custom categories and restoration of a missing fixture. API lint/format checks pass. Browser checks confirm the 28-record diary, three `Weekly groceries` results, two `payroll` incomes and no payroll expenses. The 14 recording cases in `docs/DEMO_CASES.md` are prepared manual scenarios, not 14 newly executed automated tests.
 31. Cents-first typing in the browser produces 0.01 → 0.15 → 1.56 → 15.64 for 1/5/6/4. Backspace reverses the final step; letters leave the amount unchanged. Editing opens the original $5.75 unchanged; pasting 15,64 gives 15.64, while pasting 12.345 preserves the previous value. Mobile layout checked at 390 px. All drafts cancelled; no user records modified. Eight new helper tests and all seven session tests pass, as do frontend lint/format/build.
+32. Browser checks confirm minus/underscore open Expense and equals/plus open Income; the Amount receives focus after readiness and shows the matching sign. Typing +-_ in Search does not open a form. The normal Add button resets new transactions to Expense. Four shortcut helper tests join the prior 15 tests (19 frontend tests total); all pass. No draft was saved during shortcut QA.
 
 Local browser screenshots are under ignored `.local/screenshots`. Real user records are not exported. Screenshots from the QA cycle are local verification evidence, not submission assets.
 

@@ -80,7 +80,7 @@ npm run format:check
 npm run build
 ```
 
-The root test command runs **69 API integration tests** with Jest + Supertest against isolated MongoDB processes and **15 frontend tests (7 session + 8 amount-input)** with Node's native runner and actual Axios interceptors. They never use the development database or Docker. API cases include password hashing/login, invalid/expired tokens, POST refresh/logout, complete CRUD, exact cents, leap dates, malformed/missing IDs, category normalization/type consistency, ownership, deterministic ordering and concurrent reclassification. Frontend cases cover shared refresh, retry failures, transient refresh errors, logout ordering, stale bootstrap, disposal and cents-first entry/paste/backspace/boundaries. First API test execution downloads a MongoDB binary; later runs reuse its cache.
+The root test command runs **69 API integration tests** with Jest + Supertest against isolated MongoDB processes and **19 frontend tests (7 session + 8 amount-input + 4 shortcut)** with Node's native runner and actual Axios interceptors. They never use the development database or Docker. API cases include password hashing/login, invalid/expired tokens, POST refresh/logout, complete CRUD, exact cents, leap dates, malformed/missing IDs, category normalization/type consistency, ownership, deterministic ordering and concurrent reclassification. Frontend cases cover shared refresh, retry failures, transient refresh errors, logout ordering, stale bootstrap, disposal and cents-first entry/paste/backspace/boundaries. First API test execution downloads a MongoDB binary; later runs reuse its cache.
 
 Production output is `FrontEnd/dist`. The Vite build reports a large chunk warning; bundle splitting is a possible follow-up for this small MVP.
 
@@ -164,3 +164,7 @@ npm run export:clean
 This copies an explicit allowlist of current source/config/docs into a new timestamped folder under `.local/submission`; it excludes old Git history, evidence, secrets, dependencies, build output, database data and inactive template files. The export has the same setup/run commands.
 
 GitHub publication, creating a new Git history, sharing access, recording/uploading Loom and submitting the company's form require a separate final decision. A [3–5 minute Loom script](docs/LOOM.md) is ready.
+
+### Keyboard entry
+
+Outside editable fields, `-` / `_` opens Expense and `+` / `=` opens Income. The amount receives focus once the modal animation and category loading finish. Its prefix shows `− $` / `+ $`, while the API still stores positive cents with a separate transaction type. Shortcuts ignore browser modifiers, repeated keys, composition and open transaction/delete dialogs.

@@ -134,5 +134,6 @@
   "format.date": "MMM D, YYYY",
   "Transaction changed. Reload it and try again.": "Transaction changed. Reload it and try again.",
   "Request body must contain valid JSON.": "Request body must contain valid JSON.",
-  "Type digits; the last two are cents.": "Type digits; the last two are cents."
+  "Type digits; the last two are cents.": "Type digits; the last two are cents.",
+  "Shortcuts: - / _ Expense, + / = Income": "Shortcuts: - / _ Expense, + / = Income"
 }

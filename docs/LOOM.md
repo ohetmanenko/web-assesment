@@ -16,6 +16,7 @@ Show the English/Italian control briefly, then return to English for the walkthr
 ## 0:30–1:30 — Create and read
 
 Create an expense: $12.34, Food & drinks, today's date, Lunch.
+Press `-` outside input fields to open Expense with Amount focused, then type `1234`. Press `+` or `=` for Income. The amount prefix shows the direction; all stored amounts remain positive cents.
 Expected: exactly one new expense row, income unchanged, expenses increased by $12.34.
 Show the actual row and totals.
 

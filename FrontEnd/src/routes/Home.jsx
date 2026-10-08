@@ -39,6 +39,7 @@ import { useAuth } from '../helpers/core/AuthContext';
 import Api, { getApiError } from '../helpers/core/Api';
 import { compareTransactionDates, formatMoney, sortTransactions } from '../helpers/transactions';
 import TransactionForm from '../components/TransactionForm';
+import { transactionShortcut } from '../helpers/transaction-shortcuts.mjs';
 
 const sortOptions = [
   { key: 'date:descend', label: 'Newest first' },
@@ -64,6 +65,7 @@ const Home = () => {
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [initialType, setInitialType] = useState('expense');
   const [deleting, setDeleting] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [page, setPage] = useState(1);
@@ -137,10 +139,22 @@ const Home = () => {
     setPage(1);
   };
 
-  const add = () => {
+  const add = useCallback((nextType = 'expense') => {
     setEditing(null);
+    setInitialType(nextType);
     setOpen(true);
-  };
+  }, []);
+  useEffect(() => {
+    const onKeyDown = event => {
+      if (open || deleteTarget || signingOut || (loading && !records.length)) return;
+      const nextType = transactionShortcut(event);
+      if (!nextType) return;
+      event.preventDefault();
+      add(nextType);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [add, open, deleteTarget, signingOut, loading, records.length]);
   const edit = record => {
     setEditing(record);
     setOpen(true);
@@ -372,7 +386,8 @@ const Home = () => {
                 type="primary"
                 size="large"
                 icon={<FontAwesomeIcon icon={faPlus} />}
-                onClick={add}
+                onClick={() => add()}
+                title={t('Shortcuts: - / _ Expense, + / = Income')}
                 disabled={loading && !records.length}
               >
                 {t('Add transaction')}
@@ -514,7 +529,13 @@ const Home = () => {
           <span>Daily Ledger</span>
         </footer>
       </main>
-      <TransactionForm open={open} record={editing} onClose={() => setOpen(false)} onSaved={saved} />
+      <TransactionForm
+        open={open}
+        record={editing}
+        initialType={initialType}
+        onClose={() => setOpen(false)}
+        onSaved={saved}
+      />
       <Modal
         title={t('Delete this transaction?')}
         open={!!deleteTarget}

@@ -41,3 +41,5 @@ See [verification](../VERIFICATION.md), [security notes](../SECURITY.md), [Loom 
 Post-report demonstration preparation: [28 fictional transactions and 14 recording cases](../DEMO_CASES.md). Run `npm run seed:demo` to populate a fresh demo database without overwriting existing records or edits.
 
 Post-report amount-input update: digits now accumulate from cents (`1564` → `$15.64`). The frontend has 15 tests: 7 session + 8 amount-input tests. The original reports describe the earlier decimal editor; use the current README and recording cases for input instructions. No API or database money representation changed.
+
+Post-report shortcuts update: `-` / `_` opens Expense, `+` / `=` opens Income; Amount autofocuses and displays the direction sign. Four shortcut tests bring the current frontend total to 19. See the current recording cases for the keyboard route.

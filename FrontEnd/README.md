@@ -13,3 +13,5 @@ Unused original template components remain outside the active dependency graph.
 `npm test` runs seven native Node tests against the actual Axios session coordinator in `src/helpers/core/session.mjs`. They cover concurrent refresh, business errors after refresh, invalid/transient refresh failures, logout ordering, stale initial checks and provider cleanup. Refresh/logout use POST. Stale transaction list requests are cancelled after successful writes; form submission has a synchronous in-flight guard.
 
 Eight amount-input tests join the seven session tests (15 total). The dedicated CentsInput preserves existing edit values and accepts digits, Backspace and decimal paste.
+
+Four shortcut tests bring the frontend total to 19. Home binds and cleans up the keydown listener. The shared form autofocuses Amount after loading/animation, and CentsInput displays the direction sign without changing its positive value.

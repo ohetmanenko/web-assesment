@@ -23,7 +23,7 @@ import { amountToCents, centsToInput, titleCaseCategory } from '../helpers/trans
 import TransactionFormSkeleton from './TransactionFormSkeleton';
 import CentsInput from './CentsInput';
 
-const TransactionForm = ({ open, record, onClose, onSaved }) => {
+const TransactionForm = ({ open, record, initialType = 'expense', onClose, onSaved }) => {
   const { t, i18n } = useDiary();
   const categoryName = value => t('category.' + value, { defaultValue: value });
   const [form] = Form.useForm();
@@ -36,6 +36,7 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
   const [loadError, setLoadError] = useState('');
   const [reload, setReload] = useState(0);
   const [categoryNotice, setCategoryNotice] = useState('');
+  const [modalReady, setModalReady] = useState(false);
   const type = Form.useWatch('type', form) || 'expense';
   const category = Form.useWatch('category', form);
   const customName = Form.useWatch('customCategoryName', form) || '';
@@ -72,7 +73,7 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
             date: dayjs(record.date),
             description: record.description
           }
-        : { type: 'expense', date: dayjs(), description: '' }
+        : { type: initialType, date: dayjs(), description: '' }
     );
     Api.get('/categories', { signal: controller.signal })
       .then(({ data }) => {
@@ -99,7 +100,7 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
       active = false;
       controller.abort();
     };
-  }, [open, record, reload, form]);
+  }, [open, record, initialType, reload, form]);
 
   useEffect(() => {
     if (!open) return;
@@ -187,6 +188,7 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
         className={'transaction-modal ' + type}
         title={record ? t('Edit transaction') : t('Add a transaction')}
         open={open}
+        afterOpenChange={setModalReady}
         onCancel={onClose}
         onOk={() => form.submit()}
         okText={record ? t('Save changes') : t('Add transaction')}
@@ -251,7 +253,13 @@ const TransactionForm = ({ open, record, onClose, onSaved }) => {
                     }
                   ]}
                 >
-                  <CentsInput placeholder={t('0.00')} className="full-width" size="large" />
+                  <CentsInput
+                    direction={type}
+                    autoFocus={open && modalReady && !categoryLoading && !loadError}
+                    placeholder={t('0.00')}
+                    className="full-width"
+                    size="large"
+                  />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={12}>

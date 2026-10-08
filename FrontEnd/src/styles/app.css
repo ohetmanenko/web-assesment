@@ -331,6 +331,12 @@ a {
 .amount-cell.income {
   color: #22796b;
 }
+.amount-input-prefix.income {
+  color: #176b65;
+}
+.amount-input-prefix.expense {
+  color: #9d5b35;
+}
 .amount-cell.expense {
   color: #5f6974;
 }
